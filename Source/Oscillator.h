@@ -39,6 +39,9 @@ private:
     float sampleRate;
     float phase;
     float phaseDelta;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Oscillator)
 };
 
 
@@ -50,6 +53,9 @@ class SineOscillator : public Oscillator
 public:
     // DSP methods.
     float output (float _phase) override;
+    
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SineOscillator)
 };
 
 
@@ -61,6 +67,9 @@ class SquareOscillator : public Oscillator
 public:
     // DSP methods.
     float output (float _phase) override;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SquareOscillator)
 };
 
 
@@ -81,6 +90,8 @@ public:
     
 private:
     float pulseWidth = 0.5f;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PulseOscillator)
 };
 
 
@@ -92,6 +103,9 @@ class TriangleOscillator : public Oscillator
 public:
     // DSP methods.
     float output (float _phase) override;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TriangleOscillator)
 };
 
 
@@ -103,4 +117,7 @@ class SawtoothOscillator : public Oscillator
 public:
     // DSP methods.
     float output (float _phase) override;
+    
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SawtoothOscillator)
 };

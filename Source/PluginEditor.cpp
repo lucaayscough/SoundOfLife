@@ -1,32 +1,25 @@
 #include "Headers.h"
 
 
-//==============================================================================
-SoundOfLifeAudioProcessorEditor::SoundOfLifeAudioProcessorEditor (SoundOfLifeAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+SoundOfLifeAudioProcessorEditor::SoundOfLifeAudioProcessorEditor (SoundOfLifeAudioProcessor& _audioProcessor, View& _view)
+    :   AudioProcessorEditor (&_audioProcessor),
+        audioProcessor (_audioProcessor),
+        view (_view)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setSize (900, 600);
+    addAndMakeVisible(view);
 }
 
 SoundOfLifeAudioProcessorEditor::~SoundOfLifeAudioProcessorEditor()
 {
 }
 
-//==============================================================================
-void SoundOfLifeAudioProcessorEditor::paint (juce::Graphics& g)
+void SoundOfLifeAudioProcessorEditor::paint (juce::Graphics& _graphics)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
 }
 
 void SoundOfLifeAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    // Sets the bounds for the entire view.
+    view.setBounds(getLocalBounds());
 }

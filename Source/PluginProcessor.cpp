@@ -4,14 +4,17 @@
 //==============================================================================
 SoundOfLifeAudioProcessor::SoundOfLifeAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
+    :   AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
                       #if ! JucePlugin_IsSynth
                        .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
+        valueTreeState (*this, nullptr, getName(), {}),
+        controller (view, model)
+        
 #endif
 {
 }
@@ -85,7 +88,7 @@ void SoundOfLifeAudioProcessor::changeProgramName (int index, const juce::String
 //==============================================================================
 void SoundOfLifeAudioProcessor::prepareToPlay(double _sampleRate, int _samplesPerBlock)
 {
-    oscillator.prepareToPlay(220, _sampleRate);
+    //oscillator.prepareToPlay(220, _sampleRate);
 }
 
 void SoundOfLifeAudioProcessor::releaseResources()
@@ -131,7 +134,8 @@ void SoundOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
     for(int i = 0; i < buffer.getNumSamples(); i++)
     {
-        auto sample = oscillator.processSample() * 0.5;
+        //auto sample = oscillator.processSample() * 0.5;
+        auto sample = 0;
         
         for (int channel = 0; channel < totalNumInputChannels; ++channel)
         {
@@ -149,21 +153,16 @@ bool SoundOfLifeAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* SoundOfLifeAudioProcessor::createEditor()
 {
-    return new SoundOfLifeAudioProcessorEditor (*this);
+    return new SoundOfLifeAudioProcessorEditor (*this, view);
 }
 
 //==============================================================================
 void SoundOfLifeAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
 }
 
 void SoundOfLifeAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
 }
 
 //==============================================================================

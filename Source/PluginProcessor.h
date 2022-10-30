@@ -48,7 +48,11 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
-    SawtoothOscillator oscillator;
+    juce::AudioProcessorValueTreeState valueTreeState;
+    
+    View view;
+    Model model;
+    Controller controller;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoundOfLifeAudioProcessor)
 };
