@@ -3,7 +3,7 @@
 
 //================================================//
 
-class SoundOfLifeAudioProcessorEditor  : public juce::AudioProcessorEditor
+class SoundOfLifeAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:
     SoundOfLifeAudioProcessorEditor (SoundOfLifeAudioProcessor&, View&);

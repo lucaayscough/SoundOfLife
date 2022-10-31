@@ -4,13 +4,17 @@
 //================================================//
 /// Grid model class.
 
-class GridModel
+struct GridModel
 {
 public:
     GridModel();
     ~GridModel();
     
+    // Getter methods.
+    juce::OwnedArray<CellModel>& getCells();
+    
 private:
+    juce::OwnedArray<CellModel> cells;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GridModel)
 };
@@ -49,11 +53,19 @@ public:
     ~GridController();
     
     // Init methods.
+    void constructCellsModel();
     void constructCellsView();
+    void constructCellsController();
+    
+    // Grid update methods.
+    void updateGrid();
+    
     
 private:
     GridModel& gridModel;
     GridView& gridView;
+    
+    juce::OwnedArray<CellController> cells;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GridController)
 };
