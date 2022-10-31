@@ -2,64 +2,36 @@
 
 
 //================================================//
-// Base Oscillator class.
+// Base oscillator class.
 
-Oscillator::Oscillator()
-{
-}
-
-Oscillator::~Oscillator()
-{
-}
+Oscillator::Oscillator() {}
+Oscillator::~Oscillator() {}
 
 
 //================================================//
+// Setter methods.
 
-void Oscillator::setFrequency (float _frequency)
-{
-    frequency = _frequency;
-}
-
-void Oscillator::setSampleRate (float _sampleRate)
-{
-    sampleRate = _sampleRate;
-}
-
-void Oscillator::setPhase (float _phase)
-{
-    phase = _phase;
-}
-
-void Oscillator::setPhaseDelta (float _phaseDelta)
-{
-    phaseDelta = _phaseDelta;
-}
-
-//================================================//
-
-float Oscillator::getFrequency()
-{
-    return frequency;
-}
-
-float Oscillator::getSampleRate()
-{
-    return sampleRate;
-}
-
-float Oscillator::getPhase()
-{
-    return phase;
-}
-
-float Oscillator::getPhaseDelta()
-{
-    return phaseDelta;
-}
+void Oscillator::setFrequency (float _frequency)                    { frequency = _frequency; }
+void Oscillator::setSampleRate (float _sampleRate)                  { sampleRate = _sampleRate; }
+void Oscillator::setPhase (float _phase)                            { phase = _phase; }
+void Oscillator::setPhaseDelta (float _phaseDelta)                  { phaseDelta = _phaseDelta; }
 
 
 //================================================//
+// Getter methods.
 
+float Oscillator::getFrequency()                                    { return frequency; }
+float Oscillator::getSampleRate()                                   { return sampleRate; }
+float Oscillator::getPhase()                                        { return phase; }
+float Oscillator::getPhaseDelta()                                   { return phaseDelta; }
+
+
+//================================================//
+// Phase methods.
+
+/**
+    Updates the phase of the oscillator's cycle by adding a phase delta value.
+ */
 void Oscillator::updatePhase()
 {
     setPhase(getPhase() + getPhaseDelta());
@@ -68,6 +40,10 @@ void Oscillator::updatePhase()
         setPhase(getPhase() - 1.0f);
 }
 
+/**
+    Updates the phase delta of the oscllator based on the current frequency
+    and sample rate.
+ */
 void Oscillator::updatePhaseDelta()
 {
     setPhaseDelta(getFrequency() / getSampleRate());
@@ -75,6 +51,13 @@ void Oscillator::updatePhaseDelta()
 
 
 //================================================//
+// Init methods.
+
+/**
+    Prepares the oscillator for playback.
+    @param _frequency Frequency to use.
+    @param _sampleRate Sample rate to use.
+ */
 
 void Oscillator::prepareToPlay (float _frequency, float _sampleRate)
 {
@@ -85,27 +68,46 @@ void Oscillator::prepareToPlay (float _frequency, float _sampleRate)
 
 
 //================================================//
+// DSP methods.
+
+/**
+    Virtual method that returns the phase to be outputted.
+    @param _phase Phase to use.
+ */
 
 float Oscillator::output (float _phase)
 {
     return _phase;
 }
 
+/**
+    Processes a single sample, updates the phase of the oscillator
+    and returns the processed sample.
+ */
+
 float Oscillator::processSample()
 {
-    float _sample = output(getPhase());
+    float _sample = output (getPhase());
     updatePhase();
     
     return _sample;
 }
 
-void Oscillator::processBlock (juce::AudioBuffer<float>& _buffer)
-{
-}
+/**
+    Processes a block of samples and updates the phase of the oscillator.
+    @param _buffer Reference to buffer of samples to process.
+ */
+
+void Oscillator::processBlock (juce::AudioBuffer<float>& _buffer) {}
 
 
 //================================================//
 // Sine wave oscillator.
+
+/**
+    Outputs the sample value for the current phase based on sine wave algorithm.
+    @param _phase Phase to use.
+ */
 
 float SineOscillator::output (float _phase)
 {
@@ -115,6 +117,11 @@ float SineOscillator::output (float _phase)
 
 //================================================//
 // Square wave oscillator.
+
+/**
+    Outputs the sample value for the current phase based on square wave algorithm.
+    @param _phase Phase to use.
+ */
 
 float SquareOscillator::output (float _phase)
 {
@@ -130,26 +137,25 @@ float SquareOscillator::output (float _phase)
 // Pulse wave oscillator.
 
 
-//================================================//
+//================================================//                
 // Setter methods.
 
-void PulseOscillator::setPulseWidth (float _pulseWidth)
-{
-    pulseWidth = _pulseWidth;
-}
+void PulseOscillator::setPulseWidth (float _pulseWidth)             { pulseWidth = _pulseWidth; }
 
 
 //================================================//
 // Getter methods.
 
-float PulseOscillator::getPulseWidth()
-{
-    return pulseWidth;
-}
+float PulseOscillator::getPulseWidth()                              { return pulseWidth; }
 
 
 //================================================//
 // DSP methods.
+
+/**
+    Outputs the sample value for the current phase based on pulse wave algorithm.
+    @param _phase Phase to use.
+ */
 
 float PulseOscillator::output (float _phase)
 {
@@ -170,6 +176,11 @@ float PulseOscillator::output (float _phase)
 //================================================//
 // DSP methods.
 
+/**
+    Outputs the sample value for the current phase based on triangle wave algorithm.
+    @param _phase Phase to use.
+ */
+
 float TriangleOscillator::output (float _phase)
 {
     // Algorithm used to compute triangle wave in range [-1,1] --> https://wikimedia.org/api/rest_v1/media/math/render/svg/bc9fd743afd5943b7f83248e59d55d97119257b9
@@ -183,6 +194,11 @@ float TriangleOscillator::output (float _phase)
 
 //================================================//
 // DSP methods.
+
+/**
+    Outputs the sample value for the current phase based on sawtooth wave algorithm.
+    @param _phase Phase to use.
+ */
 
 float SawtoothOscillator::output (float _phase)
 {

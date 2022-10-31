@@ -50,8 +50,8 @@ public:
 private:
     juce::AudioProcessorValueTreeState valueTreeState;
     
-    View view;
     Model model;
+    View view;
     Controller controller;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoundOfLifeAudioProcessor)

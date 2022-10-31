@@ -1,13 +1,19 @@
 #include "Headers.h"
 
 
+//================================================//
+// View class.
+
 View::View()
 {
+    addAndMakeVisible (grid);
 }
 
-View::~View()
-{
-}
+View::~View() {}
+
+
+//================================================//
+// Component methods.
 
 void View::paint (juce::Graphics& _graphics)
 {
@@ -16,4 +22,11 @@ void View::paint (juce::Graphics& _graphics)
 
 void View::resized()
 {
+    grid.setBounds (getLocalBounds());
 }
+
+
+//================================================//
+// View class.
+
+GridView& View::getGrid()                                           { return grid; }

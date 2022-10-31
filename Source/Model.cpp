@@ -1,10 +1,15 @@
 #include "Headers.h"
 
 
-Model::Model()
-{
-}
+//================================================//
+// Model class.
 
-Model::~Model()
-{
-}
+Model::Model() {}
+
+Model::~Model() {}
+
+
+//================================================//
+// Getter methods.
+
+GridModel& Model::getGrid() { return grid; }

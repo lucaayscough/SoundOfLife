@@ -1,22 +1,24 @@
 #include "Headers.h"
 
 
+//================================================//
+// Plugin Editor class.
+
 SoundOfLifeAudioProcessorEditor::SoundOfLifeAudioProcessorEditor (SoundOfLifeAudioProcessor& _audioProcessor, View& _view)
     :   AudioProcessorEditor (&_audioProcessor),
         audioProcessor (_audioProcessor),
         view (_view)
 {
-    setSize (900, 600);
-    addAndMakeVisible(view);
+    setSize (Variables::windowWidth, Variables::windowHeight);
+    addAndMakeVisible (view);
 }
 
-SoundOfLifeAudioProcessorEditor::~SoundOfLifeAudioProcessorEditor()
-{
-}
+SoundOfLifeAudioProcessorEditor::~SoundOfLifeAudioProcessorEditor() {}
 
-void SoundOfLifeAudioProcessorEditor::paint (juce::Graphics& _graphics)
-{
-}
+
+//================================================//
+
+void SoundOfLifeAudioProcessorEditor::paint (juce::Graphics& _graphics){}
 
 void SoundOfLifeAudioProcessorEditor::resized()
 {

@@ -13,7 +13,7 @@ SoundOfLifeAudioProcessor::SoundOfLifeAudioProcessor()
                      #endif
                        ),
         valueTreeState (*this, nullptr, getName(), {}),
-        controller (view, model)
+        controller (model, view)
         
 #endif
 {

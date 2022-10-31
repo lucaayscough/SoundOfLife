@@ -1,11 +1,13 @@
 #include "Headers.h"
 
 
-Controller::Controller (View& _view, Model& _model)
-    :   view(_view), model(_model)
+//================================================//
+// Controller class.
+
+Controller::Controller (Model& _model, View& _view)
+    :   model (_model), view (_view),
+        grid (_model.getGrid(), _view.getGrid())
 {
 }
 
-Controller::~Controller()
-{
-}
+Controller::~Controller() {}

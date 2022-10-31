@@ -20,6 +20,11 @@
       <FILE id="Q7Wjv5" name="Model.h" compile="0" resource="0" file="Source/Model.h"/>
       <FILE id="qwaeIN" name="View.cpp" compile="1" resource="0" file="Source/View.cpp"/>
       <FILE id="vB2g9f" name="View.h" compile="0" resource="0" file="Source/View.h"/>
+      <FILE id="Rza1UC" name="Cell.cpp" compile="1" resource="0" file="Source/Cell.cpp"/>
+      <FILE id="OMrRgT" name="Cell.h" compile="0" resource="0" file="Source/Cell.h"/>
+      <FILE id="LZBVUL" name="Grid.cpp" compile="1" resource="0" file="Source/Grid.cpp"/>
+      <FILE id="xlw5Qe" name="Grid.h" compile="0" resource="0" file="Source/Grid.h"/>
+      <FILE id="xI4fX0" name="Variables.h" compile="0" resource="0" file="Source/Variables.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
