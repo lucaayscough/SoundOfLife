@@ -46,13 +46,11 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    Grid& getGrid();
 
 private:
-    juce::AudioProcessorValueTreeState valueTreeState;
-    
-    Model model;
-    View view;
-    Controller controller;
+    Grid grid;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoundOfLifeAudioProcessor)
 };

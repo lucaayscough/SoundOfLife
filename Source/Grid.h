@@ -1,71 +1,26 @@
 #pragma once
 
 
-//================================================//
-/// Grid model class.
-
-struct GridModel
+class Grid : public juce::Timer
 {
 public:
-    GridModel();
-    ~GridModel();
+    Grid();
+    ~Grid();
     
-    // Getter methods.
-    juce::OwnedArray<CellModel>& getCells();
-    
-private:
-    juce::OwnedArray<CellModel> cells;
-    
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GridModel)
-};
-
-
-//================================================//
-/// Grid view class.
-
-class GridView  : public juce::Component
-{
-public:
-    GridView();
-    ~GridView();
-    
-    // Component class.
-    void paint (juce::Graphics& _graphics) override;
-    void resized() override;
-    
-    // Getter methods.
-    juce::OwnedArray<CellView>& getCells();
-    
-private:
-    juce::OwnedArray<CellView> cells;
-    
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GridView)
-};
-
-
-//================================================//
-/// Grid controller class.
-
-class GridController
-{
-public:
-    GridController (GridModel& _gridModel, GridView& _gridView);
-    ~GridController();
-    
-    // Init methods.
-    void constructCellsModel();
-    void constructCellsView();
-    void constructCellsController();
-    
-    // Grid update methods.
+    void initialize();
     void updateGrid();
     
+    float getCell(int _row, int _column);
+    
+    void timerCallback() override;
     
 private:
-    GridModel& gridModel;
-    GridView& gridView;
+    float grid[Variables::numRows][Variables::numColumns];
+    int numCells = Variables::numRows * Variables::numColumns;
     
-    juce::OwnedArray<CellController> cells;
-    
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GridController)
+    juce::Random random;
+    juce::String gridOutput;
 };
+
+
+

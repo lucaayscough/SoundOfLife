@@ -11,12 +11,10 @@ SoundOfLifeAudioProcessor::SoundOfLifeAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ),
-        valueTreeState (*this, nullptr, getName(), {}),
-        controller (model, view)
-        
+                       )
 #endif
 {
+    grid.initialize();
 }
 
 SoundOfLifeAudioProcessor::~SoundOfLifeAudioProcessor()
@@ -86,16 +84,9 @@ void SoundOfLifeAudioProcessor::changeProgramName (int index, const juce::String
 }
 
 //==============================================================================
-void SoundOfLifeAudioProcessor::prepareToPlay(double _sampleRate, int _samplesPerBlock)
-{
-    //oscillator.prepareToPlay(220, _sampleRate);
-}
+void SoundOfLifeAudioProcessor::prepareToPlay(double _sampleRate, int _samplesPerBlock) {}
 
-void SoundOfLifeAudioProcessor::releaseResources()
-{
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
-}
+void SoundOfLifeAudioProcessor::releaseResources() {}
 
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool SoundOfLifeAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -148,12 +139,12 @@ void SoundOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 //==============================================================================
 bool SoundOfLifeAudioProcessor::hasEditor() const
 {
-    return true; // (change this to false if you choose to not supply an editor)
+    return true;
 }
 
 juce::AudioProcessorEditor* SoundOfLifeAudioProcessor::createEditor()
 {
-    return new SoundOfLifeAudioProcessorEditor (*this, view);
+    return new SoundOfLifeAudioProcessorEditor (*this);
 }
 
 //==============================================================================
@@ -170,4 +161,9 @@ void SoundOfLifeAudioProcessor::setStateInformation (const void* data, int sizeI
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new SoundOfLifeAudioProcessor();
+}
+
+Grid& SoundOfLifeAudioProcessor::getGrid()
+{
+    return grid;
 }

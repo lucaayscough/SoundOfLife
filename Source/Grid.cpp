@@ -1,169 +1,125 @@
 #include "Headers.h"
 
 
-//================================================//
-// Grid model class.
-
-GridModel::GridModel() {}
-
-GridModel::~GridModel() {}
-
-
-//================================================//
-// Grid model class.
-
-juce::OwnedArray<CellModel>& GridModel::getCells()                    { return cells; }
-
-
-//================================================//
-// Grid view class.
-
-GridView::GridView() {}
-
-GridView::~GridView() {}
-
-
-//================================================//
-// Component methods.
-
-void GridView::paint (juce::Graphics& _graphics) {}
-
-void GridView::resized()
+Grid::Grid()
 {
-    // Calculate size of cells.
-    auto _cellWidth = Variables::windowWidth / Variables::numColumns;
-    auto _cellHeight = Variables::windowHeight / Variables::numRows;
+    startTimer(Variables::refreshRate);
+}
 
-    int i = 0;
+Grid::~Grid() {}
+
+void Grid::initialize()
+{
+    for (int i = 0; i < Variables::numRows; i++)
+    {
+        for (int j = 0; j < Variables::numColumns; j++)
+        {
+            int _random = random.nextInt (juce::Range<int> (-3, 2));
+            if (_random < 0)
+                _random = 0;
+            
+            grid[i][j] = _random;
+            
+            gridOutput += (juce::String (grid[i][j]) + " ");
+        }
+        
+        gridOutput += "\n";
+    }
     
-    // Iterate through all cells.
+    DBG (gridOutput);
+}
+
+void Grid::updateGrid()
+{
+    DBG ("Updating...");
+    
+    gridOutput.clear();
+    
     for (int row = 0; row < Variables::numRows; row++)
     {
         for (int column = 0; column < Variables::numColumns; column++)
         {
-            // Set bounds to current cell and make it visible.
-            cells[i]->setBounds (column * _cellWidth, row * _cellHeight, _cellWidth, _cellHeight);
-            addAndMakeVisible(cells[i]);
+            // Count number of live cells around current cell.
+            int numAlive = 0;
             
-            i++;
-        }
-    }
-}
-
-//================================================//
-// Getter methods.
-
-juce::OwnedArray<CellView>& GridView::getCells()                    { return cells; }
-
-
-//================================================//
-// Grid controller class.
-
-GridController::GridController (GridModel& _gridModel, GridView& _gridView)
-    :   gridModel (_gridModel), gridView (_gridView)
-{
-    constructCellsModel();
-    constructCellsView();
-}
-
-GridController::~GridController() {}
-
-
-//================================================//
-// Init methods.
-
-/**
-    Fills the cells model array with new cells.
- */
-
-void GridController::constructCellsModel()
-{
-    auto& _cells = gridModel.getCells();
-    auto _numCells = Variables::numRows * Variables::numColumns;
-    
-    // Allocate storage needed to store cells in array.
-    _cells.ensureStorageAllocated(_numCells);
-    
-    // Construct cells and push the into cells array.
-    for (int i = 0; i < _numCells; i++)
-        _cells.add(new CellModel());
-}
-
-/**
-    Fills the cells view array with new cells.
- */
-
-void GridController::constructCellsView()
-{
-    auto& _cells = gridView.getCells();
-    auto _numCells = Variables::numRows * Variables::numColumns;
-    
-    // Allocate storage needed to store cells in array.
-    _cells.ensureStorageAllocated(_numCells);
-    
-    // Construct cells and push the into cells array.
-    for (int i = 0; i < _numCells; i++)
-        _cells.add(new CellView());
-}
-
-/**
-    Fills the cells controller array with new cells.
- */
-
-void GridController::constructCellsController()
-{
-    auto& _model = gridModel.getCells();
-    auto& _view = gridView.getCells();
-    
-    auto _numCells = Variables::numRows * Variables::numColumns;
-    
-    // Allocate storage needed to store cells in array.
-    cells.ensureStorageAllocated(_numCells);
-    
-    // Construct cells and push the into cells array.
-    for (int i = 0; i < _numCells; i++)
-        cells.add(new CellController(*_model[i], *_view[i]));
-}
-
-
-//================================================//
-// Grid update methods.
-
-/**
-    Updates the entire view of grid.
- */
-
-void GridController::updateGrid()
-{
-    DBG ("Updating grid...");
-
-    auto& _cellsModel = gridModel.getCells();
-    auto& _cellsView = gridView.getCells();
-    
-    juce::Random random;
-    
-    int i = 0;
-    
-    // Iterate through all cells.
-    for (int row = 0; row < Variables::numRows; row++)
-    {
-        for (int column = 0; column < Variables::numColumns; column++)
-        {
-            if (random.nextInt (juce::Range<int> (0, 2)))
+            // Check cell left.
+            if (column > 0)
+                if (grid[row][column - 1])
+                    numAlive++;
+            
+            // Check cell right.
+            if (column < Variables::numColumns - 1)
+                if (grid[row][column + 1])
+                    numAlive++;
+            
+            // Check cell top.
+            if (row > 0)
+                if (grid[row - 1][column])
+                    numAlive++;
+                    
+            // Check cell top-left.
+            if (row > 0 && column > 0)
+                if (grid[row - 1][column - 1])
+                    numAlive++;
+            
+            // Check cell top-right.
+            if (row > 0 && column < Variables::numColumns - 1)
+                if (grid[row - 1][column + 1])
+                    numAlive++;
+            
+            // Check cell bottom.
+            if (row < Variables::numRows - 1)
+                if (grid[row + 1][column])
+                    numAlive++;
+            
+            // Check cell bottom-left.
+            if (row < Variables::numRows - 1 && column > 0)
+                if (grid[row + 1][column - 1])
+                    numAlive++;
+            
+            // Check cell bottom-right.
+            if (row < Variables::numRows - 1 && column > Variables::numColumns - 1)
+                if (grid[row + 1][column + 1])
+                    numAlive++;
+        
+            
+            
+            // 1) Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+            // 2) Any live cell with two or three live neighbours lives on to the next generation.
+            // 3) Any live cell with more than three live neighbours dies, as if by overpopulation.
+            // 4) Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+            
+            
+            // Calculate state for next iteration.
+            
+            if (grid[row][column])
             {
-                _cellsModel[i]->setIsAlive(true);
-                _cellsView[i]->setColour (juce::Colours::white);
+                if (numAlive < 2)
+                    grid[row][column] = 0;
+                
+                else if (numAlive > 3)
+                    grid[row][column] = 0;
             }
             
-            else
-            {
-                _cellsModel[i]->setIsAlive(false);
-                _cellsView[i]->setColour (juce::Colours::black);
-            }
+            else if (numAlive == 3)
+                grid[row][column] = 1;
             
-            i++;
+            gridOutput += (juce::String (grid[row][column]) + " ");
         }
+        
+        gridOutput += "\n";
     }
     
-    gridView.repaint();
+    
+    //DBG (gridOutput);
+}
+
+float Grid::getCell(int _row, int _column)
+{
+    return grid[_row][_column];
+}
+
+void Grid::timerCallback()
+{
+    updateGrid();
 }
