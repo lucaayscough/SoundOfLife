@@ -19,6 +19,8 @@
       <FILE id="xI4fX0" name="Variables.h" compile="0" resource="0" file="Source/Variables.h"/>
       <FILE id="vxJ63B" name="Grid.h" compile="0" resource="0" file="Source/Grid.h"/>
       <FILE id="MCM8gx" name="Cell.cpp" compile="1" resource="0" file="Source/Cell.cpp"/>
+      <FILE id="ANFMEG" name="Synthesis.cpp" compile="1" resource="0" file="Source/Synthesis.cpp"/>
+      <FILE id="hvEZ1Z" name="Synthesis.h" compile="0" resource="0" file="Source/Synthesis.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>

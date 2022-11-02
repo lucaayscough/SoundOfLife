@@ -104,6 +104,8 @@ void Oscillator::processBlock (juce::AudioBuffer<float>& _buffer) {}
 //================================================//
 // Sine wave oscillator.
 
+SineOscillator::SineOscillator() {}
+
 /**
     Outputs the sample value for the current phase based on sine wave algorithm.
     @param _phase Phase to use.
@@ -117,6 +119,8 @@ float SineOscillator::output (float _phase)
 
 //================================================//
 // Square wave oscillator.
+
+SquareOscillator::SquareOscillator() {}
 
 /**
     Outputs the sample value for the current phase based on square wave algorithm.
@@ -135,6 +139,8 @@ float SquareOscillator::output (float _phase)
 
 //================================================//
 // Pulse wave oscillator.
+
+PulseOscillator::PulseOscillator() {}
 
 
 //================================================//                
@@ -172,6 +178,8 @@ float PulseOscillator::output (float _phase)
 //================================================//
 // Triangle wave oscillator.
 
+TriangleOscillator::TriangleOscillator() {}
+
 
 //================================================//
 // DSP methods.
@@ -190,6 +198,8 @@ float TriangleOscillator::output (float _phase)
 
 //================================================//
 // Sawtooth wave oscillator.
+
+SawtoothOscillator::SawtoothOscillator() {}
 
 
 //================================================//

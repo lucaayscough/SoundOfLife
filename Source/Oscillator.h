@@ -51,6 +51,8 @@ private:
 class SineOscillator : public Oscillator
 {
 public:
+    SineOscillator();
+    
     // DSP methods.
     float output (float _phase) override;
     
@@ -65,6 +67,8 @@ private:
 class SquareOscillator : public Oscillator
 {
 public:
+    SquareOscillator();
+    
     // DSP methods.
     float output (float _phase) override;
 
@@ -79,6 +83,8 @@ private:
 class PulseOscillator : public Oscillator
 {
 public:
+    PulseOscillator();
+    
     // Setter methods.
     void setPulseWidth (float _pulseWidth);
     
@@ -101,6 +107,8 @@ private:
 class TriangleOscillator : public Oscillator
 {
 public:
+    TriangleOscillator();
+    
     // DSP methods.
     float output (float _phase) override;
 
@@ -115,6 +123,8 @@ private:
 class SawtoothOscillator : public Oscillator
 {
 public:
+    SawtoothOscillator();
+    
     // DSP methods.
     float output (float _phase) override;
     

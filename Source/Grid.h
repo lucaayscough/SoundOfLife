@@ -8,6 +8,9 @@ public:
     ~Grid();
     
     void initialize();
+    
+    int getNumAlive(int _row, int _column);
+    void setNextState(int _row, int _column, int _numAlive);
     void updateGrid();
     
     float getCell(int _row, int _column);

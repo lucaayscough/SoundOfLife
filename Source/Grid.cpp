@@ -10,108 +10,84 @@ Grid::~Grid() {}
 
 void Grid::initialize()
 {
-    for (int i = 0; i < Variables::numRows; i++)
-    {
-        for (int j = 0; j < Variables::numColumns; j++)
-        {
-            int _random = random.nextInt (juce::Range<int> (-3, 2));
-            if (_random < 0)
-                _random = 0;
-            
-            grid[i][j] = _random;
-            
-            gridOutput += (juce::String (grid[i][j]) + " ");
-        }
-        
-        gridOutput += "\n";
-    }
+    // TODO:
+    // Make this initalize a frame of dead cells.
     
-    DBG (gridOutput);
-}
-
-void Grid::updateGrid()
-{
-    DBG ("Updating...");
-    
-    gridOutput.clear();
     
     for (int row = 0; row < Variables::numRows; row++)
     {
         for (int column = 0; column < Variables::numColumns; column++)
         {
-            // Count number of live cells around current cell.
-            int numAlive = 0;
             
-            // Check cell left.
-            if (column > 0)
-                if (grid[row][column - 1])
-                    numAlive++;
-            
-            // Check cell right.
-            if (column < Variables::numColumns - 1)
-                if (grid[row][column + 1])
-                    numAlive++;
-            
-            // Check cell top.
-            if (row > 0)
-                if (grid[row - 1][column])
-                    numAlive++;
-                    
-            // Check cell top-left.
-            if (row > 0 && column > 0)
-                if (grid[row - 1][column - 1])
-                    numAlive++;
-            
-            // Check cell top-right.
-            if (row > 0 && column < Variables::numColumns - 1)
-                if (grid[row - 1][column + 1])
-                    numAlive++;
-            
-            // Check cell bottom.
-            if (row < Variables::numRows - 1)
-                if (grid[row + 1][column])
-                    numAlive++;
-            
-            // Check cell bottom-left.
-            if (row < Variables::numRows - 1 && column > 0)
-                if (grid[row + 1][column - 1])
-                    numAlive++;
-            
-            // Check cell bottom-right.
-            if (row < Variables::numRows - 1 && column > Variables::numColumns - 1)
-                if (grid[row + 1][column + 1])
-                    numAlive++;
-        
-            
-            
-            // 1) Any live cell with fewer than two live neighbours dies, as if by underpopulation.
-            // 2) Any live cell with two or three live neighbours lives on to the next generation.
-            // 3) Any live cell with more than three live neighbours dies, as if by overpopulation.
-            // 4) Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-            
-            
-            // Calculate state for next iteration.
-            
-            if (grid[row][column])
+            // If cell is a border cell set to dead.
+            if (row == 0 || row == Variables::numRows - 1 || column == 0 || column == Variables::numColumns - 1)
             {
-                if (numAlive < 2)
-                    grid[row][column] = 0;
-                
-                else if (numAlive > 3)
-                    grid[row][column] = 0;
+                grid[row][column] = 0;
             }
             
-            else if (numAlive == 3)
-                grid[row][column] = 1;
+            // Else randomly set to 0 or 1.
+            else
+            {
+                int _random = random.nextInt (juce::Range<int> (Variables::lowRandomRange, 2));
+                if (_random < 0)
+                    _random = 0;
             
-            gridOutput += (juce::String (grid[row][column]) + " ");
+                grid[row][column] = _random;
+            }
         }
+    }
+}
+
+int Grid::getNumAlive(int _row, int _column)
+{
+    return (
+            grid[_row][_column - 1]     +
+            grid[_row][_column + 1]     +
+            grid[_row - 1][_column]     +
+            grid[_row - 1][_column - 1] +
+            grid[_row - 1][_column + 1] +
+            grid[_row + 1][_column]     +
+            grid[_row + 1][_column - 1] +
+            grid[_row + 1][_column + 1]
+            );
+}
+
+void Grid::setNextState(int _row, int _column, int _numAlive)
+{
+    // 1) Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+    // 2) Any live cell with two or three live neighbours lives on to the next generation.
+    // 3) Any live cell with more than three live neighbours dies, as if by overpopulation.
+    // 4) Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+    
+    if (grid[_row][_column])
+    {
+        // Rule 1
+        if (_numAlive < 2)
+            grid[_row][_column] = 0;
         
-        gridOutput += "\n";
+        // Rule 3
+        else if (_numAlive > 3)
+            grid[_row][_column] = 0;
     }
     
-    
-    //DBG (gridOutput);
+    // Rule 4
+    else if (_numAlive == 3)
+        grid[_row][_column] = 1;
+}
+
+void Grid::updateGrid()
+{
+    for (int row = 1; row < Variables::numRows - 1; row++)
+    {
+        for (int column = 1; column < Variables::numColumns - 1; column++)
+        {
+            // Get number of cells alive around current cell.
+            int numAlive = getNumAlive(row, column);
+            
+            // Calculate state for next iteration.
+            setNextState(row, column, numAlive);
+        }
+    }
 }
 
 float Grid::getCell(int _row, int _column)

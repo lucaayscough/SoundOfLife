@@ -8,5 +8,7 @@
 #include "Cell.h"
 #include "Grid.h"
 
+#include "Synthesis.h"
+
 #include "PluginProcessor.h"
 #include "PluginEditor.h"

@@ -20,8 +20,8 @@ SoundOfLifeAudioProcessorEditor::~SoundOfLifeAudioProcessorEditor() {}
 void SoundOfLifeAudioProcessorEditor::paint (juce::Graphics& _graphics)
 {
     Grid& _grid = audioProcessor.getGrid();
-    float _width = Variables::windowWidth / Variables::numRows;
-    float _height = Variables::windowHeight / Variables::numColumns;
+    float _width = (float)Variables::windowWidth / (float)Variables::numRows;
+    float _height = (float)Variables::windowHeight / (float)Variables::numColumns;
     
     for (int i = 0; i < Variables::numRows; i++)
     {
@@ -41,9 +41,7 @@ void SoundOfLifeAudioProcessorEditor::paint (juce::Graphics& _graphics)
     }
 }
 
-void SoundOfLifeAudioProcessorEditor::resized()
-{
-}
+void SoundOfLifeAudioProcessorEditor::resized() {}
 
 void SoundOfLifeAudioProcessorEditor::timerCallback()
 {

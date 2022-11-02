@@ -11,15 +11,14 @@ SoundOfLifeAudioProcessor::SoundOfLifeAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
+        synthesis (grid)
 #endif
 {
     grid.initialize();
 }
 
-SoundOfLifeAudioProcessor::~SoundOfLifeAudioProcessor()
-{
-}
+SoundOfLifeAudioProcessor::~SoundOfLifeAudioProcessor() {}
 
 //==============================================================================
 const juce::String SoundOfLifeAudioProcessor::getName() const
@@ -84,7 +83,10 @@ void SoundOfLifeAudioProcessor::changeProgramName (int index, const juce::String
 }
 
 //==============================================================================
-void SoundOfLifeAudioProcessor::prepareToPlay(double _sampleRate, int _samplesPerBlock) {}
+void SoundOfLifeAudioProcessor::prepareToPlay(double _sampleRate, int _samplesPerBlock)
+{
+    synthesis.prepareToPlay(55, _sampleRate);
+}
 
 void SoundOfLifeAudioProcessor::releaseResources() {}
 
@@ -125,13 +127,12 @@ void SoundOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
     for(int i = 0; i < buffer.getNumSamples(); i++)
     {
-        //auto sample = oscillator.processSample() * 0.5;
-        auto sample = 0;
+        auto sample = synthesis.processSample();
         
         for (int channel = 0; channel < totalNumInputChannels; ++channel)
         {
             auto* channelData = buffer.getWritePointer(channel);
-            channelData[i] = sample;
+            channelData[i] = sample * 0.5;
         }
     }
 }
@@ -162,6 +163,9 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new SoundOfLifeAudioProcessor();
 }
+
+
+
 
 Grid& SoundOfLifeAudioProcessor::getGrid()
 {
