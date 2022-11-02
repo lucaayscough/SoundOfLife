@@ -35,6 +35,13 @@ void SoundOfLifeAudioProcessorEditor::paint (juce::Graphics& _graphics)
             Cell& _cell = *_grid.getCell (i, j);
             colour = juce::Colour (255.0f, 255.0f, 255.0f, _cell.getFade());
             
+            /*
+            if (_cell.getIsAlive())
+                colour = juce::Colours::white;
+            else
+                colour = juce::Colours::black;
+             */
+            
             _graphics.setColour(colour);
             _graphics.fillRect(i * _width, j * _height, _width, _height);
         }

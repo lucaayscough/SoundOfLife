@@ -12,7 +12,7 @@ public:
     float processSample();
     
 private:
-    juce::OwnedArray<SineOscillator> oscillators;
+    juce::OwnedArray<TriangleOscillator> oscillators;
     Grid& grid;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Synthesis)

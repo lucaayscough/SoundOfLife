@@ -15,7 +15,7 @@ void Synthesis::initOscillators()
     
     for (int i = 0; i < Variables::numColumns; i++)
     {
-        oscillators.add (new SineOscillator());
+        oscillators.add (new TriangleOscillator());
     }
 }
 
@@ -23,7 +23,7 @@ void Synthesis::prepareToPlay (float _frequency, float _sampleRate)
 {
     for (int i = 0; i < Variables::numColumns; i++)
     {
-        oscillators[i]->prepareToPlay (_frequency * (i + 1), _sampleRate);
+        oscillators[i]->prepareToPlay (_frequency * (2.235 * i + 1), _sampleRate);
     }
 }
 
@@ -33,24 +33,22 @@ float Synthesis::processSample()
     // First and last columns will always be silent.
     
     float _mix = 0;
-    float _log;
-    float _sample = 0;
-    
-    for (int i = 0; i < Variables::numColumns; i++)
+
+    for (int column = 0; column < Variables::numColumns; column++)
     {
-        _log = std::log10((float)i + 1);
+        float _sample = oscillators[column]->processSample();
+     
+        float gain = 0;
         
         for (int row = 0; row < Variables::numRows; row++)
-        {
-            if (grid.getCell(row, i))
-            {
-                _sample += oscillators[i]->processSample() * (1.0 / (i + 1));
-                
-                break;
-            }
+        {x
+            gain += grid.getCell (row, column)->getFade();
+            grid.getCell (row, column)->updateFade();
         }
+
+        gain /= (float)Variables::numRows;
         
-        _mix += _sample / (float)Variables::numRows;
+        _mix += (_sample * gain) * (1.0 / (2.7182 * ((float)column + 1.0)));
     }
     
     return _mix;
