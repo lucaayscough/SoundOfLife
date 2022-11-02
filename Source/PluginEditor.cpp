@@ -30,7 +30,7 @@ void SoundOfLifeAudioProcessorEditor::paint (juce::Graphics& _graphics)
             
             juce::Colour colour;
             
-            if (_grid.getCell(i, j))
+            if (_grid.getCellIsAlive (i, j))
                 colour = juce::Colours::white;
             else
                 colour = juce::Colours::black;

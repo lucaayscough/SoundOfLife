@@ -1,11 +1,21 @@
-/*
-  ==============================================================================
+#include "Headers.h"
 
-    Cell.cpp
-    Created: 1 Nov 2022 4:32:56pm
-    Author:  Luca Ayscough
 
-  ==============================================================================
-*/
+//================================================//
+// Cell class containing state information.
 
-#include "Cell.h"
+Cell::Cell() {}
+
+Cell::~Cell() {}
+
+
+//================================================//
+// Setter methods.
+
+void Cell::setIsAlive (bool _isAlive) { isAlive = _isAlive; }
+
+
+//================================================//
+// Getter methods.
+
+bool Cell::getIsAlive() { return isAlive; }

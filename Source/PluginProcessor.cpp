@@ -15,7 +15,6 @@ SoundOfLifeAudioProcessor::SoundOfLifeAudioProcessor()
         synthesis (grid)
 #endif
 {
-    grid.initialize();
 }
 
 SoundOfLifeAudioProcessor::~SoundOfLifeAudioProcessor() {}
