@@ -100,30 +100,32 @@ int Grid::getNumAlive(int _row, int _column)
 //================================================//
 // Grid state methods.
 
-void Grid::setNextState(int _row, int _column, int _numAlive)
+void Grid::updateCellState(int _row, int _column, int _numAlive)
 {
     // 1) Any live cell with fewer than two live neighbours dies, as if by underpopulation.
     // 2) Any live cell with two or three live neighbours lives on to the next generation.
     // 3) Any live cell with more than three live neighbours dies, as if by overpopulation.
     // 4) Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
     
-    if (getCellIsAlive(_row, _column))
+    if (getCellIsAlive (_row, _column))
     {
         // Rule 1
         if (_numAlive < 2)
-            setCellIsAlive(_row, _column, false);
+            setCellIsAlive (_row, _column, false);
         
         // Rule 3
         else if (_numAlive > 3)
-            setCellIsAlive(_row, _column, false);
+            setCellIsAlive (_row, _column, false);
     }
     
     // Rule 4
     else if (_numAlive == 3)
-        setCellIsAlive(_row, _column, true);
+        setCellIsAlive (_row, _column, true);
+    
+    getCell (_row, _column)->updateFade();
 }
 
-void Grid::updateGrid()
+void Grid::updateGridState()
 {
     for (int row = 1; row < Variables::numRows - 1; row++)
     {
@@ -133,7 +135,7 @@ void Grid::updateGrid()
             int numAlive = getNumAlive(row, column);
             
             // Calculate state for next iteration.
-            setNextState(row, column, numAlive);
+            updateCellState(row, column, numAlive);
         }
     }
 }
@@ -144,5 +146,5 @@ void Grid::updateGrid()
 
 void Grid::timerCallback()
 {
-    updateGrid();
+    updateGridState();
 }

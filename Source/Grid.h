@@ -24,8 +24,8 @@ public:
     int getNumAlive (int _row, int _column);
     
     // Grid state methods.
-    void setNextState (int _row, int _column, int _numAlive);
-    void updateGrid();
+    void updateCellState (int _row, int _column, int _numAlive);
+    void updateGridState();
     
     // Timer class methods.
     void timerCallback() override;
@@ -38,6 +38,3 @@ private:
     juce::Random random;
     juce::String gridOutput;
 };
-
-
-

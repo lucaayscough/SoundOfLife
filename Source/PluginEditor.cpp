@@ -20,20 +20,20 @@ SoundOfLifeAudioProcessorEditor::~SoundOfLifeAudioProcessorEditor() {}
 void SoundOfLifeAudioProcessorEditor::paint (juce::Graphics& _graphics)
 {
     Grid& _grid = audioProcessor.getGrid();
+    
     float _width = (float)Variables::windowWidth / (float)Variables::numRows;
     float _height = (float)Variables::windowHeight / (float)Variables::numColumns;
+    
+    juce::Colour colour;
+    
+    _graphics.fillAll (juce::Colour (0, 0, 0));
     
     for (int i = 0; i < Variables::numRows; i++)
     {
         for (int j = 0; j < Variables::numColumns; j++)
         {
-            
-            juce::Colour colour;
-            
-            if (_grid.getCellIsAlive (i, j))
-                colour = juce::Colours::white;
-            else
-                colour = juce::Colours::black;
+            Cell& _cell = *_grid.getCell (i, j);
+            colour = juce::Colour (255.0f, 255.0f, 255.0f, _cell.getFade());
             
             _graphics.setColour(colour);
             _graphics.fillRect(i * _width, j * _height, _width, _height);
