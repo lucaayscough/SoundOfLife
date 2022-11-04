@@ -1,6 +1,9 @@
 #include "Headers.h"
 
 
+//================================================//
+// Synthesis class.
+
 Synthesis::Synthesis(Grid& grid)
     :   m_Grid (grid)
 {
@@ -19,10 +22,18 @@ void Synthesis::initOscillators()
     }
 }
 
+
+//================================================//
+// Setter methods.
+
 void Synthesis::setBlockSize (int blockSize)
 {
     m_BlockSize = blockSize;
 }
+
+
+//================================================//
+// Getter methods.
 
 int Synthesis::getBlockSize()
 {
@@ -51,6 +62,10 @@ float Synthesis::getSpectrumGainDecay (float gain, float column)
     return gain * (1.0 / (2.7182 * (column + 1.0)));
 }
 
+
+//================================================//
+// AudioBuffer methods.
+
 void Synthesis::sumBuffers (juce::AudioBuffer<float>& buffer_1, juce::AudioBuffer<float>& buffer_2)
 {
     jassert (buffer_1.getNumSamples() == buffer_2.getNumSamples());
@@ -63,6 +78,10 @@ void Synthesis::sumBuffers (juce::AudioBuffer<float>& buffer_1, juce::AudioBuffe
         bufferToWrite[i] += bufferToRead[i];
     }
 }
+
+
+//================================================//
+// Init methods.
 
 void Synthesis::prepareToPlay (float frequency, float sampleRate)
 {
@@ -82,6 +101,10 @@ void Synthesis::prepareToPlay (float frequency, float sampleRate, int blockSize)
     setBlockSize(blockSize);
     m_Buffer.setSize(1, blockSize);
 }
+
+
+//================================================//
+// DSP methods.
 
 float Synthesis::processSample()
 {

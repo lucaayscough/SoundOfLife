@@ -80,7 +80,7 @@ void Oscillator::prepareToPlay (float frequency, float sampleRate, int blockSize
 {
     setFrequency (frequency);
     setSampleRate (sampleRate);
-    setBlockSize(blockSize);
+    setBlockSize (blockSize);
     
     m_Buffer.setSize(1, blockSize);
     
@@ -123,10 +123,11 @@ float Oscillator::processSample()
 juce::AudioBuffer<float>& Oscillator::processBlock()
 {
     m_Buffer.clear();
+    auto* bufferData = m_Buffer.getWritePointer (0);
     
     for (int i = 0; i < m_BlockSize; i++)
     {
-        m_Buffer.addSample(0, i, output (m_Phase));
+        bufferData[i] = output (m_Phase);
         updatePhase();
     }
     
