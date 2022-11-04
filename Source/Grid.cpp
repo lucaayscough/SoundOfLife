@@ -61,7 +61,7 @@ void Grid::initializeGrid()
 
 void Grid::setCellIsAlive (int row, int column, bool isAlive)
 {
-    getCell(row, column)->setIsAlive(isAlive);
+    getCell (row, column)->setIsAlive(isAlive);
 }
 
 
@@ -85,14 +85,14 @@ bool Grid::getCellIsAlive (int row, int column)
 int Grid::getNumAlive(int row, int column)
 {
     return (
-            getCellIsAlive(row, column - 1) +
-            getCellIsAlive(row, column + 1) +
-            getCellIsAlive(row - 1, column) +
-            getCellIsAlive(row - 1, column - 1) +
-            getCellIsAlive(row - 1, column + 1) +
-            getCellIsAlive(row + 1, column) +
-            getCellIsAlive(row + 1, column - 1) +
-            getCellIsAlive(row + 1, column + 1)
+            getCellIsAlive (row, column - 1) +
+            getCellIsAlive (row, column + 1) +
+            getCellIsAlive (row - 1, column) +
+            getCellIsAlive (row - 1, column - 1) +
+            getCellIsAlive (row - 1, column + 1) +
+            getCellIsAlive (row + 1, column) +
+            getCellIsAlive (row + 1, column - 1) +
+            getCellIsAlive (row + 1, column + 1)
             );
 }
 
@@ -135,7 +135,7 @@ void Grid::updateGridState()
             int numAlive = getNumAlive(row, column);
             
             // Calculate state for next iteration.
-            updateCellState(row, column, numAlive);
+            updateCellState (row, column, numAlive);
         }
     }
 }
