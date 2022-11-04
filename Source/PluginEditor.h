@@ -9,10 +9,11 @@ public:
     SoundOfLifeAudioProcessorEditor (SoundOfLifeAudioProcessor&);
     ~SoundOfLifeAudioProcessorEditor() override;
     
-    // Graphics methods.
-    void paint (juce::Graphics& _graphics) override;
+    // Component class methods.
+    void paint (juce::Graphics& graphics) override;
     void resized() override;
     
+    // Timer class methods.
     void timerCallback() override;
 
 private:

@@ -4,51 +4,59 @@
 //================================================//
 // Plugin Editor class.
 
-SoundOfLifeAudioProcessorEditor::SoundOfLifeAudioProcessorEditor (SoundOfLifeAudioProcessor& _audioProcessor)
-    :   AudioProcessorEditor (&_audioProcessor),
-        audioProcessor (_audioProcessor)
+SoundOfLifeAudioProcessorEditor::SoundOfLifeAudioProcessorEditor (SoundOfLifeAudioProcessor& audioProcessor)
+    :   AudioProcessorEditor (&audioProcessor),
+        audioProcessor (audioProcessor)
 {
     setSize (Variables::windowWidth, Variables::windowHeight);
-    startTimer(Variables::refreshRate);
+    startTimer (Variables::refreshRate);
 }
 
 SoundOfLifeAudioProcessorEditor::~SoundOfLifeAudioProcessorEditor() {}
 
 
 //================================================//
+// Component class methods.
 
-void SoundOfLifeAudioProcessorEditor::paint (juce::Graphics& _graphics)
+void SoundOfLifeAudioProcessorEditor::paint (juce::Graphics& graphics)
 {
-    Grid& _grid = audioProcessor.getGrid();
+    Grid& grid = audioProcessor.getGrid();
     
-    float _width = (float)Variables::windowWidth / (float)Variables::numRows;
-    float _height = (float)Variables::windowHeight / (float)Variables::numColumns;
+    float width = (float)Variables::windowWidth / (float)Variables::numRows;
+    float height = (float)Variables::windowHeight / (float)Variables::numColumns;
     
     juce::Colour colour;
     
-    _graphics.fillAll (juce::Colour (0, 0, 0));
+    graphics.fillAll (juce::Colour (0, 0, 0));
     
     for (int i = 0; i < Variables::numRows; i++)
     {
         for (int j = 0; j < Variables::numColumns; j++)
         {
-            Cell& _cell = *_grid.getCell (i, j);
-            colour = juce::Colour (255.0f, 255.0f, 255.0f, _cell.getFade());
+            Cell& _cell = *grid.getCell (i, j);
             
-            /*
-            if (_cell.getIsAlive())
-                colour = juce::Colours::white;
+            if (Variables::useColour)
+                colour = juce::Colour (255.0f, 255.0f, 255.0f, _cell.getFade());
+            
             else
-                colour = juce::Colours::black;
-             */
+            {
+                if (_cell.getIsAlive())
+                    colour = juce::Colours::white;
+                else
+                    colour = juce::Colours::black;
+            }
             
-            _graphics.setColour(colour);
-            _graphics.fillRect(i * _width, j * _height, _width, _height);
+            graphics.setColour(colour);
+            graphics.fillRect(i * width, j * height, width, height);
         }
     }
 }
 
 void SoundOfLifeAudioProcessorEditor::resized() {}
+
+
+//================================================//
+// Timer class methods.
 
 void SoundOfLifeAudioProcessorEditor::timerCallback()
 {

@@ -12,15 +12,15 @@ Cell::~Cell() {}
 //================================================//
 // Setter methods.
 
-void Cell::setIsAlive (bool _isAlive)                               { isAlive = _isAlive; }
-void Cell::setFade (float _fade)                                    { fade = _fade; }
+void Cell::setIsAlive (bool isAlive)                                { m_IsAlive = isAlive; }
+void Cell::setFade (float fade)                                     { m_Fade = fade; }
 
 
 //================================================//
 // Getter methods.
 
-bool Cell::getIsAlive()                                             { return isAlive; }
-float Cell::getFade()                                               { return fade; }
+bool Cell::getIsAlive()                                             { return m_IsAlive; }
+float Cell::getFade()                                               { return m_Fade; }
 
 
 //================================================//
@@ -28,13 +28,13 @@ float Cell::getFade()                                               { return fad
 
 void Cell::updateFade()
 {
-    if (isAlive && fade < 1.0f)
+    if (m_IsAlive && m_Fade < 1.0f)
     {
-        fade += Variables::fadeAmount;
+        m_Fade += Variables::fadeAmount;
     }
     
-    else if (!isAlive && fade > 0.0f)
+    else if (!m_IsAlive && m_Fade > 0.0f)
     {
-        fade -= Variables::fadeAmount;
+        m_Fade -= Variables::fadeAmount;
     }
 }

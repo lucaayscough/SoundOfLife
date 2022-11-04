@@ -14,27 +14,27 @@ public:
     void initializeGrid();
     
     // Setter methods.
-    void setCellIsAlive (int _row, int _column, bool _isAlive);
+    void setCellIsAlive (int row, int column, bool isAlive);
     
     // Getter methods.
-    Cell* getCell (int _row, int _column);
-    bool getCellIsAlive (int _row, int _column);
+    Cell* getCell (int row, int column);
+    bool getCellIsAlive (int row, int column);
     
     // Grid logic methods.
-    int getNumAlive (int _row, int _column);
+    int getNumAlive (int row, int column);
     
     // Grid state methods.
-    void updateCellState (int _row, int _column, int _numAlive);
+    void updateCellState (int row, int column, int numAlive);
     void updateGridState();
     
     // Timer class methods.
     void timerCallback() override;
     
 private:
-    juce::OwnedArray<Cell> cells;
+    juce::OwnedArray<Cell> m_Cells;
 
-    int numCells = Variables::numRows * Variables::numColumns;
+    int m_NumCells = Variables::numRows * Variables::numColumns;
     
-    juce::Random random;
-    juce::String gridOutput;
+    juce::Random m_Random;
+    juce::String m_GridOutput;
 };

@@ -5,25 +5,28 @@
 // Base oscillator class.
 
 Oscillator::Oscillator() {}
+
 Oscillator::~Oscillator() {}
 
 
 //================================================//
 // Setter methods.
 
-void Oscillator::setFrequency (float _frequency)                    { frequency = _frequency; }
-void Oscillator::setSampleRate (float _sampleRate)                  { sampleRate = _sampleRate; }
-void Oscillator::setPhase (float _phase)                            { phase = _phase; }
-void Oscillator::setPhaseDelta (float _phaseDelta)                  { phaseDelta = _phaseDelta; }
+void Oscillator::setFrequency (float frequency)                     { m_Frequency = frequency; }
+void Oscillator::setSampleRate (float sampleRate)                   { m_SampleRate = sampleRate; }
+void Oscillator::setBlockSize (int blockSize)                       { m_BlockSize = blockSize; }
+void Oscillator::setPhase (float phase)                             { m_Phase = phase; }
+void Oscillator::setPhaseDelta (float phaseDelta)                   { m_PhaseDelta = phaseDelta; }
 
 
 //================================================//
 // Getter methods.
 
-float Oscillator::getFrequency()                                    { return frequency; }
-float Oscillator::getSampleRate()                                   { return sampleRate; }
-float Oscillator::getPhase()                                        { return phase; }
-float Oscillator::getPhaseDelta()                                   { return phaseDelta; }
+float Oscillator::getFrequency()                                    { return m_Frequency; }
+float Oscillator::getSampleRate()                                   { return m_SampleRate; }
+int Oscillator::getBlockSize()                                      { return m_BlockSize; }
+float Oscillator::getPhase()                                        { return m_Phase; }
+float Oscillator::getPhaseDelta()                                   { return m_PhaseDelta; }
 
 
 //================================================//
@@ -34,10 +37,10 @@ float Oscillator::getPhaseDelta()                                   { return pha
  */
 void Oscillator::updatePhase()
 {
-    setPhase(getPhase() + getPhaseDelta());
+    m_Phase += m_PhaseDelta;
     
-    if (getPhase() > 1.0f)
-        setPhase(getPhase() - 1.0f);
+    if (m_Phase > 1.0f)
+        m_Phase -= 1.0f;
 }
 
 /**
@@ -46,7 +49,7 @@ void Oscillator::updatePhase()
  */
 void Oscillator::updatePhaseDelta()
 {
-    setPhaseDelta(getFrequency() / getSampleRate());
+    m_PhaseDelta = m_Frequency / m_SampleRate;
 }
 
 
@@ -55,14 +58,32 @@ void Oscillator::updatePhaseDelta()
 
 /**
     Prepares the oscillator for playback.
-    @param _frequency Frequency to use.
-    @param _sampleRate Sample rate to use.
+    @param frequency Frequency to use.
+    @param sampleRate Sample rate to use.
  */
 
-void Oscillator::prepareToPlay (float _frequency, float _sampleRate)
+void Oscillator::prepareToPlay (float frequency, float sampleRate)
 {
-    setFrequency(_frequency);
-    setSampleRate(_sampleRate);
+    setFrequency (frequency);
+    setSampleRate (sampleRate);
+    updatePhaseDelta();
+}
+
+/**
+    Prepares the oscillator for playback.
+    @param frequency Frequency to use.
+    @param sampleRate Sample rate to use.
+    @param blockSize Block size to use.
+ */
+
+void Oscillator::prepareToPlay (float frequency, float sampleRate, int blockSize)
+{
+    setFrequency (frequency);
+    setSampleRate (sampleRate);
+    setBlockSize(blockSize);
+    
+    m_Buffer.setSize(1, blockSize);
+    
     updatePhaseDelta();
 }
 
@@ -72,12 +93,12 @@ void Oscillator::prepareToPlay (float _frequency, float _sampleRate)
 
 /**
     Virtual method that returns the phase to be outputted.
-    @param _phase Phase to use.
+    @param phase Phase to use.
  */
 
-float Oscillator::output (float _phase)
+float Oscillator::output (float phase)
 {
-    return _phase;
+    return phase;
 }
 
 /**
@@ -87,18 +108,30 @@ float Oscillator::output (float _phase)
 
 float Oscillator::processSample()
 {
-    float _sample = output (getPhase());
+    float sample = output (m_Phase);
     updatePhase();
     
-    return _sample;
+    return sample;
 }
 
 /**
     Processes a block of samples and updates the phase of the oscillator.
-    @param _buffer Reference to buffer of samples to process.
+    This will 
+    @param buffer Reference to buffer of samples to process.
  */
 
-void Oscillator::processBlock (juce::AudioBuffer<float>& _buffer) {}
+juce::AudioBuffer<float>& Oscillator::processBlock()
+{
+    m_Buffer.clear();
+    
+    for (int i = 0; i < m_BlockSize; i++)
+    {
+        m_Buffer.addSample(0, i, output (m_Phase));
+        updatePhase();
+    }
+    
+    return m_Buffer;
+}
 
 
 //================================================//
@@ -108,12 +141,12 @@ SineOscillator::SineOscillator() {}
 
 /**
     Outputs the sample value for the current phase based on sine wave algorithm.
-    @param _phase Phase to use.
+    @param phase Phase to use.
  */
 
-float SineOscillator::output (float _phase)
+float SineOscillator::output (float phase)
 {
-    return std::sin(2.0f * _phase * M_PI);
+    return std::sin(2.0f * phase * M_PI);
 }
 
 
@@ -124,12 +157,12 @@ SquareOscillator::SquareOscillator() {}
 
 /**
     Outputs the sample value for the current phase based on square wave algorithm.
-    @param _phase Phase to use.
+    @param phase Phase to use.
  */
 
-float SquareOscillator::output (float _phase)
+float SquareOscillator::output (float phase)
 {
-    if (_phase < 0.5f)
+    if (phase < 0.5f)
         return 1.0f;
     
     else
@@ -146,13 +179,13 @@ PulseOscillator::PulseOscillator() {}
 //================================================//                
 // Setter methods.
 
-void PulseOscillator::setPulseWidth (float _pulseWidth)             { pulseWidth = _pulseWidth; }
+void PulseOscillator::setPulseWidth (float pulseWidth)              { m_PulseWidth = pulseWidth; }
 
 
 //================================================//
 // Getter methods.
 
-float PulseOscillator::getPulseWidth()                              { return pulseWidth; }
+float PulseOscillator::getPulseWidth()                              { return m_PulseWidth; }
 
 
 //================================================//
@@ -160,14 +193,12 @@ float PulseOscillator::getPulseWidth()                              { return pul
 
 /**
     Outputs the sample value for the current phase based on pulse wave algorithm.
-    @param _phase Phase to use.
+    @param phase Phase to use.
  */
 
-float PulseOscillator::output (float _phase)
+float PulseOscillator::output (float phase)
 {
-    auto _pulseWidth = getPulseWidth();
-    
-    if (_phase < _pulseWidth)
+    if (phase < m_PulseWidth)
         return 1.0f;
     
     else
@@ -186,13 +217,13 @@ TriangleOscillator::TriangleOscillator() {}
 
 /**
     Outputs the sample value for the current phase based on triangle wave algorithm.
-    @param _phase Phase to use.
+    @param phase Phase to use.
  */
 
-float TriangleOscillator::output (float _phase)
+float TriangleOscillator::output (float phase)
 {
     // Algorithm used to compute triangle wave in range [-1,1] --> https://wikimedia.org/api/rest_v1/media/math/render/svg/bc9fd743afd5943b7f83248e59d55d97119257b9
-    return 2.0f * std::fabs(2.0f * (_phase - std::floor(_phase + 0.5f))) - 1.0f;
+    return 2.0f * std::fabs(2.0f * (phase - std::floor(phase + 0.5f))) - 1.0f;
 }
 
 
@@ -207,11 +238,11 @@ SawtoothOscillator::SawtoothOscillator() {}
 
 /**
     Outputs the sample value for the current phase based on sawtooth wave algorithm.
-    @param _phase Phase to use.
+    @param phase Phase to use.
  */
 
-float SawtoothOscillator::output (float _phase)
+float SawtoothOscillator::output (float phase)
 {
     // Algorithm used to compute sawtooth wave in range [-1,1] --> https://wikimedia.org/api/rest_v1/media/math/render/svg/0f07cb8c8f5850b17ad8c3415800046cd1f38967
-    return 2.0f * (_phase - std::floor(0.5f + _phase));
+    return 2.0f * (phase - std::floor(0.5f + phase));
 }

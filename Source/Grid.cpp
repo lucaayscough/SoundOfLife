@@ -6,7 +6,7 @@
 
 Grid::Grid()
 {
-    startTimer(Variables::refreshRate);
+    startTimer (Variables::refreshRate);
     
     initializeCells();
     initializeGrid();
@@ -21,11 +21,11 @@ Grid::~Grid() {}
 
 void Grid:: initializeCells()
 {
-    cells.ensureStorageAllocated(Variables::numRows * Variables::numColumns);
+    m_Cells.ensureStorageAllocated(Variables::numRows * Variables::numColumns);
     
     for (int i = 0; i < Variables::numRows * Variables::numColumns; i++)
     {
-        cells.add(new Cell());
+        m_Cells.add(new Cell());
     }
 }
 
@@ -43,14 +43,14 @@ void Grid::initializeGrid()
             else
             {
                 // Generates a random number between [n, 1].
-                int _random = random.nextInt (juce::Range<int> (Variables::lowRandomRange, 2));
+                int random = m_Random.nextInt (juce::Range<int> (Variables::lowRandomRange, 2));
                 
                 // This constrains the random number to [0,1].
                 // It is used to increase the chances random is 0.
-                if (_random < 0)
-                    _random = 0;
+                if (random < 0)
+                    random = 0;
             
-                setCellIsAlive (row, column, _random);
+                setCellIsAlive (row, column, random);
             }
         }
     }
@@ -59,40 +59,40 @@ void Grid::initializeGrid()
 //================================================//
 // Setter methods.
 
-void Grid::setCellIsAlive (int _row, int _column, bool _isAlive)
+void Grid::setCellIsAlive (int row, int column, bool isAlive)
 {
-    getCell(_row, _column)->setIsAlive(_isAlive);
+    getCell(row, column)->setIsAlive(isAlive);
 }
 
 
 //================================================//
 // Getter methods.
 
-Cell* Grid::getCell (int _row, int _column)
+Cell* Grid::getCell (int row, int column)
 {
-    return cells[_row * Variables::numColumns + _column];
+    return m_Cells[row * Variables::numColumns + column];
 }
 
-bool Grid::getCellIsAlive (int _row, int _column)
+bool Grid::getCellIsAlive (int row, int column)
 {
-    return getCell (_row, _column)->getIsAlive();
+    return getCell (row, column)->getIsAlive();
 }
 
 
 //================================================//
 // Grid logic methods.
 
-int Grid::getNumAlive(int _row, int _column)
+int Grid::getNumAlive(int row, int column)
 {
     return (
-            getCellIsAlive(_row, _column - 1) +
-            getCellIsAlive(_row, _column + 1) +
-            getCellIsAlive(_row - 1, _column) +
-            getCellIsAlive(_row - 1, _column - 1) +
-            getCellIsAlive(_row - 1, _column + 1) +
-            getCellIsAlive(_row + 1, _column) +
-            getCellIsAlive(_row + 1, _column - 1) +
-            getCellIsAlive(_row + 1, _column + 1)
+            getCellIsAlive(row, column - 1) +
+            getCellIsAlive(row, column + 1) +
+            getCellIsAlive(row - 1, column) +
+            getCellIsAlive(row - 1, column - 1) +
+            getCellIsAlive(row - 1, column + 1) +
+            getCellIsAlive(row + 1, column) +
+            getCellIsAlive(row + 1, column - 1) +
+            getCellIsAlive(row + 1, column + 1)
             );
 }
 
@@ -100,29 +100,29 @@ int Grid::getNumAlive(int _row, int _column)
 //================================================//
 // Grid state methods.
 
-void Grid::updateCellState(int _row, int _column, int _numAlive)
+void Grid::updateCellState(int row, int column, int numAlive)
 {
     // 1) Any live cell with fewer than two live neighbours dies, as if by underpopulation.
     // 2) Any live cell with two or three live neighbours lives on to the next generation.
     // 3) Any live cell with more than three live neighbours dies, as if by overpopulation.
     // 4) Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
     
-    if (getCellIsAlive (_row, _column))
+    if (getCellIsAlive (row, column))
     {
         // Rule 1
-        if (_numAlive < 2)
-            setCellIsAlive (_row, _column, false);
+        if (numAlive < 2)
+            setCellIsAlive (row, column, false);
         
         // Rule 3
-        else if (_numAlive > 3)
-            setCellIsAlive (_row, _column, false);
+        else if (numAlive > 3)
+            setCellIsAlive (row, column, false);
     }
     
     // Rule 4
-    else if (_numAlive == 3)
-        setCellIsAlive (_row, _column, true);
+    else if (numAlive == 3)
+        setCellIsAlive (row, column, true);
     
-    getCell (_row, _column)->updateFade();
+    getCell (row, column)->updateFade();
 }
 
 void Grid::updateGridState()

@@ -50,8 +50,8 @@ public:
     Grid& getGrid();
 
 private:
-    Grid grid;
-    Synthesis synthesis;
+    Grid m_Grid;
+    Synthesis m_Synthesis;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoundOfLifeAudioProcessor)
 };

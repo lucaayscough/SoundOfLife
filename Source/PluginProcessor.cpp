@@ -12,7 +12,7 @@ SoundOfLifeAudioProcessor::SoundOfLifeAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-        synthesis (grid)
+        m_Synthesis (m_Grid)
 #endif
 {
 }
@@ -68,9 +68,7 @@ int SoundOfLifeAudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void SoundOfLifeAudioProcessor::setCurrentProgram (int index)
-{
-}
+void SoundOfLifeAudioProcessor::setCurrentProgram (int index) {}
 
 const juce::String SoundOfLifeAudioProcessor::getProgramName (int index)
 {
@@ -82,9 +80,9 @@ void SoundOfLifeAudioProcessor::changeProgramName (int index, const juce::String
 }
 
 //==============================================================================
-void SoundOfLifeAudioProcessor::prepareToPlay(double _sampleRate, int _samplesPerBlock)
+void SoundOfLifeAudioProcessor::prepareToPlay(double sampleRate, int blockSize)
 {
-    synthesis.prepareToPlay(20, _sampleRate);
+    m_Synthesis.prepareToPlay (20, sampleRate, blockSize);
 }
 
 void SoundOfLifeAudioProcessor::releaseResources() {}
@@ -123,15 +121,17 @@ void SoundOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-
-    for(int i = 0; i < buffer.getNumSamples(); i++)
+    
+    auto& synthesisBuffer = m_Synthesis.processBlock();
+    
+    for (int i = 0; i < buffer.getNumSamples(); i++)
     {
-        auto sample = synthesis.processSample();
-        
         for (int channel = 0; channel < totalNumInputChannels; ++channel)
         {
-            auto* channelData = buffer.getWritePointer(channel);
-            channelData[i] = sample * 0.5;
+            auto* channelData = buffer.getWritePointer (channel);
+            auto sample = synthesisBuffer.getSample(0, i) * 0.5;
+            
+            channelData[i] = sample;
         }
     }
 }
@@ -168,5 +168,5 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 Grid& SoundOfLifeAudioProcessor::getGrid()
 {
-    return grid;
+    return m_Grid;
 }
