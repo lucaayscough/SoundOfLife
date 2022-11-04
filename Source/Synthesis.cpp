@@ -51,9 +51,9 @@ float Synthesis::getColumnGain(int column)
     return gain;
 }
 
-float Synthesis::getSpectrumGainDecay (float gain, float column)
+float Synthesis::getSpectrumGainDecay (float gain, float column, float frequency)
 {
-    return gain * (1.0 / (2.7182 * (column + 1.0)));
+    return gain * Variables::startFrequency * (1.0 / frequency) ;
 }
 
 
@@ -82,7 +82,7 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
     {
         auto& block = m_Oscillators[column]->processBlock();
         float gain = getColumnGain (column);
-        gain *= getSpectrumGainDecay (gain, column);
+        gain *= getSpectrumGainDecay (gain, column, m_Oscillators[column]->getFrequency());
         block.applyGain (gain);
         
         for (int channel = 0; channel < buffer.getNumChannels(); channel++)

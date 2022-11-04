@@ -82,7 +82,7 @@ void SoundOfLifeAudioProcessor::changeProgramName (int index, const juce::String
 //==============================================================================
 void SoundOfLifeAudioProcessor::prepareToPlay(double sampleRate, int blockSize)
 {
-    m_Synthesis.prepareToPlay (20, sampleRate, blockSize);
+    m_Synthesis.prepareToPlay (Variables::startFrequency, sampleRate, blockSize);
 }
 
 void SoundOfLifeAudioProcessor::releaseResources() {}
