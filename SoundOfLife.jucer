@@ -25,6 +25,8 @@
             file="Source/ModulationMatrix.cpp"/>
       <FILE id="uNO2Uo" name="ModulationMatrix.h" compile="0" resource="0"
             file="Source/ModulationMatrix.h"/>
+      <FILE id="FnHNl7" name="Panner.cpp" compile="1" resource="0" file="Source/Panner.cpp"/>
+      <FILE id="uXLIaE" name="Panner.h" compile="0" resource="0" file="Source/Panner.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>

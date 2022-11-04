@@ -60,19 +60,6 @@ void Oscillator::updatePhaseDelta()
     Prepares the oscillator for playback.
     @param frequency Frequency to use.
     @param sampleRate Sample rate to use.
- */
-
-void Oscillator::prepareToPlay (float frequency, float sampleRate)
-{
-    setFrequency (frequency);
-    setSampleRate (sampleRate);
-    updatePhaseDelta();
-}
-
-/**
-    Prepares the oscillator for playback.
-    @param frequency Frequency to use.
-    @param sampleRate Sample rate to use.
     @param blockSize Block size to use.
  */
 
@@ -102,21 +89,7 @@ float Oscillator::output (float phase)
 }
 
 /**
-    Processes a single sample, updates the phase of the oscillator
-    and returns the processed sample.
- */
-
-float Oscillator::processSample()
-{
-    float sample = output (m_Phase);
-    updatePhase();
-    
-    return sample;
-}
-
-/**
     Processes a block of samples and updates the phase of the oscillator.
-    This will 
     @param buffer Reference to buffer of samples to process.
  */
 

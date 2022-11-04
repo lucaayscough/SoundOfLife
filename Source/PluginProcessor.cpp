@@ -116,24 +116,8 @@ bool SoundOfLifeAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 void SoundOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
-
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
     
-    auto& synthesisBuffer = m_Synthesis.processBlock();
-    
-    for (int i = 0; i < buffer.getNumSamples(); i++)
-    {
-        for (int channel = 0; channel < totalNumInputChannels; ++channel)
-        {
-            auto* channelData = buffer.getWritePointer (channel);
-            auto sample = synthesisBuffer.getSample(0, i) * 0.9;
-            
-            channelData[i] = sample;
-        }
-    }
+    m_Synthesis.processBlock (buffer);
 }
 
 //==============================================================================

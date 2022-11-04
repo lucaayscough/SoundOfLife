@@ -29,12 +29,10 @@ public:
     void updatePhaseDelta();
     
     // Init methods.
-    void prepareToPlay (float frequency, float sampleRate);
     void prepareToPlay (float frequency, float sampleRate, int blockSize);
     
     // DSP methods.
     virtual float output (float phase);
-    float processSample();
     juce::AudioBuffer<float>& processBlock();
     
 private:

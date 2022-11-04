@@ -12,6 +12,6 @@ struct Variables
     static const int uiRefreshRate = 33;
     
     static const int lowRandomRange = -5;
-    static constexpr float fadeAmount = 0.01;
+    static constexpr float fadeAmount = 0.002;
     static const bool useColour = true;
 };

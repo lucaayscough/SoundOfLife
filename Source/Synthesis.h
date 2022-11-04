@@ -18,21 +18,16 @@ public:
     float getColumnGain (int column);
     float getSpectrumGainDecay (float gain, float column);
     
-    // AudioBuffer methods.
-    void sumBuffers (juce::AudioBuffer<float>& buffer_1, juce::AudioBuffer<float>& buffer_2);
-    
     // Init methods.
     void initOscillators();
-    void prepareToPlay (float frequency, float sampleRate);
     void prepareToPlay (float frequency, float sampleRate, int blockSize);
     
     // DSP methods.
-    float processSample();
-    juce::AudioBuffer<float>& processBlock();
+    void processBlock (juce::AudioBuffer<float>& buffer);
     
 private:
     juce::OwnedArray<SineOscillator> m_Oscillators;
-    juce::AudioBuffer<float> m_Buffer;
+    Panner m_Panner;
     Grid& m_Grid;
     
     int m_BlockSize;

@@ -26,19 +26,13 @@ void Synthesis::initOscillators()
 //================================================//
 // Setter methods.
 
-void Synthesis::setBlockSize (int blockSize)
-{
-    m_BlockSize = blockSize;
-}
+void Synthesis::setBlockSize (int blockSize)                        { m_BlockSize = blockSize; }
 
 
 //================================================//
 // Getter methods.
 
-int Synthesis::getBlockSize()
-{
-    return m_BlockSize;
-}
+int Synthesis::getBlockSize()                                       { return m_BlockSize; }
 
 float Synthesis::getColumnGain(int column)
 {
@@ -64,32 +58,7 @@ float Synthesis::getSpectrumGainDecay (float gain, float column)
 
 
 //================================================//
-// AudioBuffer methods.
-
-void Synthesis::sumBuffers (juce::AudioBuffer<float>& buffer_1, juce::AudioBuffer<float>& buffer_2)
-{
-    jassert (buffer_1.getNumSamples() == buffer_2.getNumSamples());
-    
-    auto* bufferToWrite = buffer_1.getWritePointer(0);
-    auto* bufferToRead = buffer_2.getReadPointer(0);
-    
-    for (int i = 0; i < m_BlockSize; i++)
-    {
-        bufferToWrite[i] += bufferToRead[i];
-    }
-}
-
-
-//================================================//
 // Init methods.
-
-void Synthesis::prepareToPlay (float frequency, float sampleRate)
-{
-    for (int i = 0; i < Variables::numColumns; i++)
-    {
-        m_Oscillators[i]->prepareToPlay (frequency * (1.05 * i + 1), sampleRate);
-    }
-}
 
 void Synthesis::prepareToPlay (float frequency, float sampleRate, int blockSize)
 {
@@ -99,43 +68,30 @@ void Synthesis::prepareToPlay (float frequency, float sampleRate, int blockSize)
     }
     
     setBlockSize(blockSize);
-    m_Buffer.setSize(1, blockSize);
 }
 
 
 //================================================//
 // DSP methods.
 
-float Synthesis::processSample()
+void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
 {
-    // Generate spectrum from sine waves.
-    // First and last columns will always be silent.
-    
-    float mix = 0;
-
-    for (int column = 0; column < Variables::numColumns; column++)
-    {
-        float sample = m_Oscillators[column]->processSample();
-        float gain = getColumnGain (column);
-        sample *= getSpectrumGainDecay (gain, column);
-        mix += sample;
-    }
-    
-    return mix;
-}
-
-juce::AudioBuffer<float>& Synthesis::processBlock()
-{
-    m_Buffer.clear();
+    buffer.clear();
     
     for (int column = 0; column < Variables::numColumns; column++)
     {
         auto& block = m_Oscillators[column]->processBlock();
         float gain = getColumnGain (column);
         gain *= getSpectrumGainDecay (gain, column);
-        block.applyGain(gain);
-        sumBuffers (m_Buffer, block);
+        block.applyGain (gain);
+        
+        for (int channel = 0; channel < buffer.getNumChannels(); channel++)
+        {
+            buffer.addFrom(channel, 0, block, 0, 0, m_BlockSize);
+        }
     }
     
-    return m_Buffer;
+    // TODO:
+    // Remove this.
+    buffer.applyGain (4.0f);
 }

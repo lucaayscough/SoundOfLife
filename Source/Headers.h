@@ -4,6 +4,7 @@
 #include "Variables.h"
 
 #include "Oscillator.h"
+#include "Panner.h"
 
 #include "Cell.h"
 #include "Grid.h"

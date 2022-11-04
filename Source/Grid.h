@@ -37,4 +37,6 @@ private:
     
     juce::Random m_Random;
     juce::String m_GridOutput;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Grid)
 };
