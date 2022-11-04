@@ -9,7 +9,7 @@ SoundOfLifeAudioProcessorEditor::SoundOfLifeAudioProcessorEditor (SoundOfLifeAud
         audioProcessor (audioProcessor)
 {
     setSize (Variables::windowWidth, Variables::windowHeight);
-    startTimer (Variables::refreshRate);
+    startTimer (Variables::uiRefreshRate);
 }
 
 SoundOfLifeAudioProcessorEditor::~SoundOfLifeAudioProcessorEditor() {}

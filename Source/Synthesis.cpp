@@ -29,6 +29,41 @@ int Synthesis::getBlockSize()
     return m_BlockSize;
 }
 
+float Synthesis::getColumnGain(int column)
+{
+    float gain = 0;
+    
+    for (int row = 0; row < Variables::numRows; row++)
+    {
+        Cell& cell = *m_Grid.getCell (row, column);
+        
+        gain += cell.getFade();
+        cell.updateFade();
+    }
+    
+    gain /= (float)Variables::numRows;
+    
+    return gain;
+}
+
+float Synthesis::getSpectrumGainDecay (float gain, float column)
+{
+    return gain * (1.0 / (2.7182 * (column + 1.0)));
+}
+
+void Synthesis::sumBuffers (juce::AudioBuffer<float>& buffer_1, juce::AudioBuffer<float>& buffer_2)
+{
+    jassert (buffer_1.getNumSamples() == buffer_2.getNumSamples());
+    
+    auto* bufferToWrite = buffer_1.getWritePointer(0);
+    auto* bufferToRead = buffer_2.getReadPointer(0);
+    
+    for (int i = 0; i < m_BlockSize; i++)
+    {
+        bufferToWrite[i] += bufferToRead[i];
+    }
+}
+
 void Synthesis::prepareToPlay (float frequency, float sampleRate)
 {
     for (int i = 0; i < Variables::numColumns; i++)
@@ -58,20 +93,9 @@ float Synthesis::processSample()
     for (int column = 0; column < Variables::numColumns; column++)
     {
         float sample = m_Oscillators[column]->processSample();
-     
-        float gain = 0;
-        
-        for (int row = 0; row < Variables::numRows; row++)
-        {
-            Cell& cell = *m_Grid.getCell (row, column);
-            
-            gain += cell.getFade();
-            cell.updateFade();
-        }
-
-        gain /= (float)Variables::numRows;
-        
-        mix += (sample * gain) * (1.0 / (2.7182 * ((float)column + 1.0)));
+        float gain = getColumnGain (column);
+        sample *= getSpectrumGainDecay (gain, column);
+        mix += sample;
     }
     
     return mix;
@@ -84,28 +108,10 @@ juce::AudioBuffer<float>& Synthesis::processBlock()
     for (int column = 0; column < Variables::numColumns; column++)
     {
         auto& block = m_Oscillators[column]->processBlock();
-     
-        float gain = 0;
-        
-        for (int row = 0; row < Variables::numRows; row++)
-        {
-            Cell& cell = *m_Grid.getCell (row, column);
-            
-            gain += cell.getFade();
-            cell.updateFade();
-        }
-
-        gain /= (float)Variables::numRows;
-        
-        for (int i = 0; i < m_BlockSize; i++)
-        {
-            auto sample = block.getSample (0, i);
-            auto oldSample = m_Buffer.getSample (0, i);
-            
-            sample = (sample * gain) * (1.0 / (2.7182 * (column + 1.0)));
-            
-            m_Buffer.setSample(0, i, sample + oldSample);
-        }
+        float gain = getColumnGain (column);
+        gain *= getSpectrumGainDecay (gain, column);
+        block.applyGain(gain);
+        sumBuffers (m_Buffer, block);
     }
     
     return m_Buffer;

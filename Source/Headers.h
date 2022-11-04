@@ -8,6 +8,8 @@
 #include "Cell.h"
 #include "Grid.h"
 
+#include "ModulationMatrix.h"
+
 #include "Synthesis.h"
 
 #include "PluginProcessor.h"

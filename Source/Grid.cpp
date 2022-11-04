@@ -6,7 +6,7 @@
 
 Grid::Grid()
 {
-    startTimer (Variables::refreshRate);
+    startTimer (Variables::gridRefreshRate);
     
     initializeCells();
     initializeGrid();

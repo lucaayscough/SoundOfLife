@@ -129,7 +129,7 @@ void SoundOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         for (int channel = 0; channel < totalNumInputChannels; ++channel)
         {
             auto* channelData = buffer.getWritePointer (channel);
-            auto sample = synthesisBuffer.getSample(0, i) * 0.5;
+            auto sample = synthesisBuffer.getSample(0, i) * 0.9;
             
             channelData[i] = sample;
         }

@@ -21,6 +21,10 @@
       <FILE id="MCM8gx" name="Cell.cpp" compile="1" resource="0" file="Source/Cell.cpp"/>
       <FILE id="ANFMEG" name="Synthesis.cpp" compile="1" resource="0" file="Source/Synthesis.cpp"/>
       <FILE id="hvEZ1Z" name="Synthesis.h" compile="0" resource="0" file="Source/Synthesis.h"/>
+      <FILE id="Z98tSt" name="ModulationMatrix.cpp" compile="1" resource="0"
+            file="Source/ModulationMatrix.cpp"/>
+      <FILE id="uNO2Uo" name="ModulationMatrix.h" compile="0" resource="0"
+            file="Source/ModulationMatrix.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
