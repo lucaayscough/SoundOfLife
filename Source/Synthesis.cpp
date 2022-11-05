@@ -7,18 +7,14 @@
 Synthesis::Synthesis(Grid& grid)
     :   m_Grid (grid)
 {
-    initOscillators();
-}
-
-Synthesis::~Synthesis() {}
-
-void Synthesis::initOscillators()
-{
+    // Init Oscillators.
     m_Oscillators.ensureStorageAllocated (Variables::numColumns);
     
     for (int i = 0; i < Variables::numColumns; i++)
         m_Oscillators.add (new SineOscillator());
 }
+
+Synthesis::~Synthesis() {}
 
 
 //================================================//
@@ -94,11 +90,10 @@ void Synthesis::updateFadeValues (int column)
 void Synthesis::prepareToPlay (float frequency, float sampleRate, int blockSize)
 {
     for (int i = 0; i < Variables::numColumns; i++)
-    {
         m_Oscillators[i]->prepareToPlay (frequency * (1.3 * i + 1), sampleRate, blockSize);
-    }
     
-    setBlockSize(blockSize);
+    setBlockSize (blockSize);
+    m_Reverb.setSampleRate (sampleRate);
 }
 
 
@@ -155,31 +150,23 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
         // Apply pan.
         if (numChannels == 2)
         {
-            for (int sample = 0; sample < m_BlockSize; sample++)
-            {
-                auto leftGain = 1.0f;
-                auto rightGain = 1.0f;
-                
-                if (panValues[sample] < 0.0)
-                {
-                    rightGain += panValues[sample];
-                }
-                
-                else if (panValues[sample] > 0.0)
-                {
-                    leftGain -= panValues[sample];
-                }
-                
-                block.applyGain (0, sample, 1, leftGain);
-                block.applyGain (1, sample, 1, rightGain);
-            }
+            m_Panner.processBlock(block, panValues);
         }
-        
         
         // Adds the processed block to the audio buffer.
         for (int channel = 0; channel < numChannels; channel++)
         {
             buffer.addFrom (channel, 0, block, channel, 0, m_BlockSize);
         }
+        
+        /*
+         if (numChannels == 2)
+        {
+            auto* leftChannel = buffer.getWritePointer (0);
+            auto* rightChannel = buffer.getWritePointer (1);
+            
+            m_Reverb.processStereo(leftChannel, rightChannel, m_BlockSize);
+        }
+         */
     }
 }

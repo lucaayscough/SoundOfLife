@@ -23,7 +23,6 @@ public:
     void updateFadeValues (int column);
     
     // Init methods.
-    void initOscillators();
     void prepareToPlay (float frequency, float sampleRate, int blockSize);
     
     // DSP methods.
@@ -31,7 +30,10 @@ public:
     
 private:
     juce::OwnedArray<SineOscillator> m_Oscillators;
+    
     Panner m_Panner;
+    juce::Reverb m_Reverb;
+    
     Grid& m_Grid;
     
     int m_BlockSize;
