@@ -40,10 +40,7 @@ float Synthesis::getColumnGain (int column)
     
     for (int row = 0; row < Variables::numRows; row++)
     {
-        Cell& cell = *m_Grid.getCell (row, column);
-        
-        gain += cell.getFade();
-        cell.updateFade();
+        gain += m_Grid.getCell (row, column)->getFade();
     }
     
     gain /= (float)Variables::numRows;
@@ -120,16 +117,38 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
     {
         auto numChannels = buffer.getNumChannels();
         auto& block = m_Oscillators[column]->processBlock();
-        float gain = getColumnGain (column);
-        gain *= getSpectralGainDecay (gain, column, m_Oscillators[column]->getFrequency());
-        block.applyGain (gain);
+        
+        juce::Array<float> gainValues;
+        juce::Array<float> panValues;
+        
+        gainValues.ensureStorageAllocated (m_BlockSize);
+        panValues.ensureStorageAllocated (m_BlockSize);
+        
+        // Gets gain and pan values.
+        for (int i = 0; i < m_BlockSize; i++)
+        {
+            // Get gain values and store them.
+            float gain = getColumnGain (column);
+            gain *= getSpectralGainDecay (gain, column, m_Oscillators[column]->getFrequency());
+            gainValues.add(gain);
+            
+            // Get pan values and store them.
+            panValues.add (getColumnPan (column));
+            
+            // Update fade values.
+            updateFadeValues (column);
+        }
+        
+        for (int sample = 0; sample < m_BlockSize; sample++)
+        {
+            block.applyGain (0, sample, 1, gainValues[sample]);
+        }
         
         if (numChannels > 1)
         {
+            // Makes the block stereo.
             block.setSize (numChannels, m_BlockSize, true);
             block.copyFrom (1, 0, block, 0, 0, m_BlockSize);
-            
-            //auto pan = getColumnPan (column);
             
             //float leftGain = ;
             //float rightGain = ;
@@ -137,8 +156,9 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
             //block.applyGain(<#int channel#>, <#int startSample#>, <#int numSamples#>, <#float gain#>);
         }
         
-        updateFadeValues (column);
         
+        
+        // Adds the processed block to the audio buffer.
         for (int channel = 0; channel < numChannels; channel++)
         {
             buffer.addFrom (channel, 0, block, channel, 0, m_BlockSize);
