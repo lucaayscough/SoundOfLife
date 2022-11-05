@@ -11,7 +11,7 @@ Synthesis::Synthesis(Grid& grid)
     m_Oscillators.ensureStorageAllocated (Variables::numColumns);
     
     for (int i = 0; i < Variables::numColumns; i++)
-        m_Oscillators.add (new SineOscillator());
+        m_Oscillators.add (new TriangleOscillator());
 }
 
 Synthesis::~Synthesis() {}
@@ -90,7 +90,7 @@ void Synthesis::updateFadeValues (int column)
 void Synthesis::prepareToPlay (float frequency, float sampleRate, int blockSize)
 {
     for (int i = 0; i < Variables::numColumns; i++)
-        m_Oscillators[i]->prepareToPlay (frequency * (1.3 * i + 1), sampleRate, blockSize);
+        m_Oscillators[i]->prepareToPlay (frequency * (Variables::frequencyMultiplier * i + 1), sampleRate, blockSize);
     
     setBlockSize (blockSize);
     m_Reverb.setSampleRate (sampleRate);
