@@ -17,9 +17,7 @@ void Synthesis::initOscillators()
     m_Oscillators.ensureStorageAllocated (Variables::numColumns);
     
     for (int i = 0; i < Variables::numColumns; i++)
-    {
         m_Oscillators.add (new SineOscillator());
-    }
 }
 
 
@@ -39,9 +37,7 @@ float Synthesis::getColumnGain (int column)
     float gain = 0;
     
     for (int row = 0; row < Variables::numRows; row++)
-    {
         gain += m_Grid.getCell (row, column)->getFade();
-    }
     
     gain /= (float)Variables::numRows;
     
@@ -139,23 +135,45 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
             updateFadeValues (column);
         }
         
+        // Apply gain to block.
         for (int sample = 0; sample < m_BlockSize; sample++)
         {
             block.applyGain (0, sample, 1, gainValues[sample]);
         }
         
+        // Expand block if buffer is not mono.
         if (numChannels > 1)
         {
-            // Makes the block stereo.
             block.setSize (numChannels, m_BlockSize, true);
-            block.copyFrom (1, 0, block, 0, 0, m_BlockSize);
             
-            //float leftGain = ;
-            //float rightGain = ;
-            
-            //block.applyGain(<#int channel#>, <#int startSample#>, <#int numSamples#>, <#float gain#>);
+            for (int channel = 1; channel < numChannels; channel++)
+            {
+                block.copyFrom (channel, 0, block, 0, 0, m_BlockSize);
+            }
         }
         
+        // Apply pan.
+        if (numChannels == 2)
+        {
+            for (int sample = 0; sample < m_BlockSize; sample++)
+            {
+                auto leftGain = 1.0f;
+                auto rightGain = 1.0f;
+                
+                if (panValues[sample] < 0.0)
+                {
+                    rightGain += panValues[sample];
+                }
+                
+                else if (panValues[sample] > 0.0)
+                {
+                    leftGain -= panValues[sample];
+                }
+                
+                block.applyGain (0, sample, 1, leftGain);
+                block.applyGain (1, sample, 1, rightGain);
+            }
+        }
         
         
         // Adds the processed block to the audio buffer.

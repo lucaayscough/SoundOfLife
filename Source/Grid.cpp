@@ -132,7 +132,7 @@ void Grid::updateGridState()
         for (int column = 1; column < Variables::numColumns - 1; column++)
         {
             // Get number of cells alive around current cell.
-            int numAlive = getNumAlive(row, column);
+            int numAlive = getNumAlive (row, column);
             
             // Calculate state for next iteration.
             updateCellState (row, column, numAlive);
