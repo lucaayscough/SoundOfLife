@@ -90,8 +90,19 @@ float Oscillator::output (float phase)
 }
 
 /**
+    Processes a single sample, updates the phase of the oscillator and returns the sample.
+ */
+
+float Oscillator::processSample()
+{
+    float sample = output (m_Phase);
+    updatePhase();
+    
+    return sample;
+}
+
+/**
     Processes a block of samples and updates the phase of the oscillator.
-    @param buffer Reference to buffer of samples to process.
  */
 
 void Oscillator::processBlock()

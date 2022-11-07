@@ -34,6 +34,7 @@ public:
     
     // DSP methods.
     virtual float output (float phase);
+    float processSample();
     void processBlock();
     
 private:

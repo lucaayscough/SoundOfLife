@@ -101,68 +101,57 @@ void Synthesis::prepareToPlay (float frequency, float sampleRate, int blockSize)
 
 void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
 {
+    int numChannels = buffer.getNumChannels();
+    int blockSize = buffer.getNumSamples();
+    
+    float sample = 0;
+    float gain;
+    
+    juce::AudioBuffer<float> block;
+    juce::Array<float> panValues;
+    
+    block.setSize (numChannels, blockSize);
+    panValues.ensureStorageAllocated (m_BlockSize);
+    
     buffer.clear();
+    block.clear();
     
-    // Process oscillators.
-    for (int column = 0; column < Variables::numColumns; column++)
+    for (int column = 0; column < Variables::numColumns; ++column)
     {
-        m_Oscillators[column]->processBlock();
-    }
-    
-    // Apply gain and pan to oscillators.
-    for (int column = 0; column < Variables::numColumns; column++)
-    {
-        auto numChannels = buffer.getNumChannels();
-        auto& block = m_Oscillators[column]->getBlock();
+        panValues.clearQuick();
         
-        juce::Array<float> gainValues;
-        juce::Array<float> panValues;
-        
-        gainValues.ensureStorageAllocated (m_BlockSize);
-        panValues.ensureStorageAllocated (m_BlockSize);
-        
-        // Get gain and pan values.
-        for (int i = 0; i < m_BlockSize; i++)
+        for (int i = 0; i < blockSize; ++i)
         {
-            // Get gain values and store them.
-            float gain = getColumnGain (column);
-            gain *= getSpectralGainDecay (gain, column, m_Oscillators[column]->getFrequency());
-            gainValues.add(gain);
+            // Sample to be further processed.
+            sample = m_Oscillators[column]->processSample();
             
-            // Get pan values and store them.
+            // Gain to be applied.
+            gain = getColumnGain (column);
+            gain *= getSpectralGainDecay (gain, column, m_Oscillators[column]->getFrequency());
+            
+            // Pan to be applied.
             panValues.add (getColumnPan (column));
             
-            // Update fade values.
+            // Update fade values for entire column.
             updateFadeValues (column);
-        }
         
-        // Apply gain to block.
-        for (int sample = 0; sample < m_BlockSize; sample++)
-        {
-            block.applyGain (0, sample, 1, gainValues[sample]);
-        }
-        
-        // Expand block if buffer is not mono.
-        if (numChannels > 1)
-        {
-            block.setSize (numChannels, m_BlockSize, true);
+            // Apply processing to sample.
+            sample *= gain;
             
-            for (int channel = 1; channel < numChannels; channel++)
+            // Add to buffer.
+            for (int channel = 0; channel < numChannels; ++channel)
             {
-                block.copyFrom (channel, 0, block, 0, 0, m_BlockSize);
+                auto* channelData = block.getWritePointer (channel);
+                channelData[i] += sample;
             }
         }
         
-        // Apply pan.
-        if (numChannels == 2)
-        {
-            m_Panner.processBlock(block, panValues);
-        }
-        
-        // Adds the processed block to the audio buffer.
-        for (int channel = 0; channel < numChannels; channel++)
-        {
-            buffer.addFrom (channel, 0, block, channel, 0, m_BlockSize);
-        }
+        // Apply pan to buffer.
+        m_Panner.processBlock (block, panValues);
+    }
+    
+    for (int channel = 0; channel < numChannels; ++channel)
+    {
+        buffer.addFrom (channel, 0, block, channel, 0, blockSize);
     }
 }
