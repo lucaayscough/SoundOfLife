@@ -27,6 +27,7 @@ float Oscillator::getSampleRate()                                   { return m_S
 int Oscillator::getBlockSize()                                      { return m_BlockSize; }
 float Oscillator::getPhase()                                        { return m_Phase; }
 float Oscillator::getPhaseDelta()                                   { return m_PhaseDelta; }
+juce::AudioBuffer<float>& Oscillator::getBlock()                    { return m_Buffer; }
 
 
 //================================================//
@@ -93,7 +94,7 @@ float Oscillator::output (float phase)
     @param buffer Reference to buffer of samples to process.
  */
 
-juce::AudioBuffer<float>& Oscillator::processBlock()
+void Oscillator::processBlock()
 {
     m_Buffer.clear();
     auto* bufferData = m_Buffer.getWritePointer (0);
@@ -103,8 +104,6 @@ juce::AudioBuffer<float>& Oscillator::processBlock()
         bufferData[i] = output (m_Phase);
         updatePhase();
     }
-    
-    return m_Buffer;
 }
 
 

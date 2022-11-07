@@ -5,7 +5,9 @@
   <MAINGROUP id="hVPvL2" name="SoundOfLife">
     <GROUP id="{59A8664F-7628-9115-082B-8D6EE8BD4EF3}" name="Source">
       <FILE id="v4m2gL" name="Grid.cpp" compile="1" resource="0" file="Source/Grid.cpp"/>
+      <FILE id="vxJ63B" name="Grid.h" compile="0" resource="0" file="Source/Grid.h"/>
       <FILE id="tIQQzt" name="Cell.h" compile="0" resource="0" file="Source/Cell.h"/>
+      <FILE id="MCM8gx" name="Cell.cpp" compile="1" resource="0" file="Source/Cell.cpp"/>
       <FILE id="UHZlDs" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="gaAqqZ" name="PluginProcessor.h" compile="0" resource="0"
@@ -17,14 +19,8 @@
       <FILE id="pY0K2B" name="Oscillator.h" compile="0" resource="0" file="Source/Oscillator.h"/>
       <FILE id="WW6otQ" name="Headers.h" compile="0" resource="0" file="Source/Headers.h"/>
       <FILE id="xI4fX0" name="Variables.h" compile="0" resource="0" file="Source/Variables.h"/>
-      <FILE id="vxJ63B" name="Grid.h" compile="0" resource="0" file="Source/Grid.h"/>
-      <FILE id="MCM8gx" name="Cell.cpp" compile="1" resource="0" file="Source/Cell.cpp"/>
       <FILE id="ANFMEG" name="Synthesis.cpp" compile="1" resource="0" file="Source/Synthesis.cpp"/>
       <FILE id="hvEZ1Z" name="Synthesis.h" compile="0" resource="0" file="Source/Synthesis.h"/>
-      <FILE id="Z98tSt" name="ModulationMatrix.cpp" compile="1" resource="0"
-            file="Source/ModulationMatrix.cpp"/>
-      <FILE id="uNO2Uo" name="ModulationMatrix.h" compile="0" resource="0"
-            file="Source/ModulationMatrix.h"/>
       <FILE id="FnHNl7" name="Panner.cpp" compile="1" resource="0" file="Source/Panner.cpp"/>
       <FILE id="uXLIaE" name="Panner.h" compile="0" resource="0" file="Source/Panner.h"/>
     </GROUP>

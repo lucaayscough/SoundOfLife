@@ -11,7 +11,7 @@ Synthesis::Synthesis(Grid& grid)
     m_Oscillators.ensureStorageAllocated (Variables::numColumns);
     
     for (int i = 0; i < Variables::numColumns; i++)
-        m_Oscillators.add (new TriangleOscillator());
+        m_Oscillators.add (new SineOscillator());
 }
 
 Synthesis::~Synthesis() {}
@@ -93,7 +93,6 @@ void Synthesis::prepareToPlay (float frequency, float sampleRate, int blockSize)
         m_Oscillators[i]->prepareToPlay (frequency * (Variables::frequencyMultiplier * i + 1), sampleRate, blockSize);
     
     setBlockSize (blockSize);
-    m_Reverb.setSampleRate (sampleRate);
 }
 
 
@@ -104,10 +103,17 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
 {
     buffer.clear();
     
+    // Process oscillators.
+    for (int column = 0; column < Variables::numColumns; column++)
+    {
+        m_Oscillators[column]->processBlock();
+    }
+    
+    // Apply gain and pan to oscillators.
     for (int column = 0; column < Variables::numColumns; column++)
     {
         auto numChannels = buffer.getNumChannels();
-        auto& block = m_Oscillators[column]->processBlock();
+        auto& block = m_Oscillators[column]->getBlock();
         
         juce::Array<float> gainValues;
         juce::Array<float> panValues;
@@ -115,7 +121,7 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
         gainValues.ensureStorageAllocated (m_BlockSize);
         panValues.ensureStorageAllocated (m_BlockSize);
         
-        // Gets gain and pan values.
+        // Get gain and pan values.
         for (int i = 0; i < m_BlockSize; i++)
         {
             // Get gain values and store them.
@@ -158,15 +164,5 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
         {
             buffer.addFrom (channel, 0, block, channel, 0, m_BlockSize);
         }
-        
-        /*
-         if (numChannels == 2)
-        {
-            auto* leftChannel = buffer.getWritePointer (0);
-            auto* rightChannel = buffer.getWritePointer (1);
-            
-            m_Reverb.processStereo(leftChannel, rightChannel, m_BlockSize);
-        }
-         */
     }
 }

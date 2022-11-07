@@ -23,6 +23,7 @@ public:
     int getBlockSize();
     float getPhase();
     float getPhaseDelta();
+    juce::AudioBuffer<float>& getBlock();
     
     // Phase methods.
     void updatePhase();
@@ -33,7 +34,7 @@ public:
     
     // DSP methods.
     virtual float output (float phase);
-    juce::AudioBuffer<float>& processBlock();
+    void processBlock();
     
 private:
     float m_Frequency;

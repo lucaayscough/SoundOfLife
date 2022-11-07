@@ -29,10 +29,9 @@ public:
     void processBlock (juce::AudioBuffer<float>& buffer);
     
 private:
-    juce::OwnedArray<TriangleOscillator> m_Oscillators;
+    juce::OwnedArray<SineOscillator> m_Oscillators;
     
     Panner m_Panner;
-    juce::Reverb m_Reverb;
     
     Grid& m_Grid;
     
