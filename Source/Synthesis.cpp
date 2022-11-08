@@ -100,7 +100,10 @@ void Synthesis::prepareToPlay (float frequency, float sampleRate, int blockSize)
     {
         DBG (frequency);
         m_Oscillators[i]->prepareToPlay (frequency, sampleRate, blockSize);
-        frequency += frequency / (i + 1.0f);
+        
+        // Harmonic series: https://en.wikipedia.org/wiki/Harmonic_series_(mathematics)
+        // And also this: https://en.wikipedia.org/wiki/Inharmonicity
+        frequency += frequency / (i + 1.0f) * Variables::inharmonicity;
     }
     
     for (int i = 0; i < Variables::numLFOs; ++i)
@@ -150,21 +153,11 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
             /*
             // Frequency modulation.
             auto oldFreq = m_Oscillators[column]->getFrequency();
-            auto newFreq = oldFreq + (m_LFOs[column % Variables::numLFOs]->processSample() * 10.0);
-            
+            auto newFreq = oldFreq + (m_LFOs[column % Variables::numLFOs]->processSample() * 40.0);
+    
             m_Oscillators[column]->setFrequency (newFreq);
             
-    
-            // Pulse width modulation.
-            auto oldPulse = m_Oscillators[column]->getPulseWidth();
-            auto newPulse = oldPulse + (m_LFOs[(column + 1) % Variables::numLFOs]->processSample() / 2.3f);
-            
-            m_Oscillators[column]->setPulseWidth(newPulse);
-            
-            
             */
-            
-            
             // Sample to be further processed.
             sample = m_Oscillators[column]->processSample();
             
@@ -191,7 +184,6 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
             /*
             // Reset values.
             m_Oscillators[column]->setFrequency (oldFreq);
-            m_Oscillators[column]->setPulseWidth (oldPulse);
              */
         }
         
@@ -204,8 +196,8 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
         buffer.addFrom (channel, 0, block, channel, 0, blockSize);
     }
     
-    //auto* leftChannel = buffer.getWritePointer(0);
-    //auto* rightChannel = buffer.getWritePointer(1);
+    auto* leftChannel = buffer.getWritePointer(0);
+    auto* rightChannel = buffer.getWritePointer(1);
     
     //m_Filter.processSamples(leftChannel, buffer.getNumSamples());
     //m_Filter.processSamples(rightChannel, buffer.getNumSamples());
