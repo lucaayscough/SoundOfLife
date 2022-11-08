@@ -20,7 +20,7 @@ struct Variables
     static const int numLFOs = 4;                                                               // Number of LFOs to instantiate
         
     static constexpr float startFrequency = 50.0f;                                              // Frequency used for the first oscillator.
-    static constexpr float inharmonicity = 1.04f;                                               // Value used to diverge the frequency oscillators.
+    static constexpr float inharmonicity = 1.01f;                                               // Value used to diverge the frequency of oscillators.
     static constexpr float frequencyLFO[4] = {0.01f, 0.002f, 0.023f, 0.001f};                   // Array containing LFO frequencies.
-    static constexpr float filterCutoff = 15000.0f;                                             // Cutoff value for the filter.
+    static constexpr float filterCutoff = 100.0f;                                               // Cutoff value for the filter.
 };

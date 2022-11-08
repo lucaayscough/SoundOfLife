@@ -35,12 +35,15 @@ public:
 private:
     juce::OwnedArray<SineOscillator> m_Oscillators;             // Array of oscillators.
     juce::OwnedArray<SineOscillator> m_LFOs;                    // Array of LFOs.
+    TriangleOscillator m_FilterModulator;                       // Oscillator used to modulate filter cutoff.
     
     Panner m_Panner;                                            // Panner used to pan oscillators.
     juce::Reverb m_Reverb;                                      // Reverb used at end of signal chain.
     
     juce::IIRFilter m_FilterLeft;                               // Filter for left channel.
     juce::IIRFilter m_FilterRight;                              // Filter for right channel.
+    
+    juce::dsp::Limiter<float> m_Limiter;                        // Limiter used at the end of signal chain.
     
     Grid& m_Grid;                                               // Reference to grid object.
     

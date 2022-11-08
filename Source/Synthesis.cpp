@@ -76,9 +76,6 @@ float Synthesis::getOscillatorGain (int oscillatorIndex)
 
 float Synthesis::getOscillatorPan (int oscillatorIndex)
 {
-    // TODO:
-    // Make this more precise.
-    
     float pan = 0;
     
     float startColumn = oscillatorIndex * (Variables::numColumns / Variables::numOscillators);
@@ -166,10 +163,16 @@ void Synthesis::prepareToPlay (float sampleRate, int blockSize)
     // Setup LFOs.
     for (int i = 0; i < Variables::numLFOs; ++i)
         m_LFOs[i]->prepareToPlay (Variables::frequencyLFO[i], sampleRate, blockSize);
+
+    m_FilterModulator.prepareToPlay(0.1f, sampleRate, blockSize);
     
     // Set member variables.
     setBlockSize (blockSize);
     setSampleRate (sampleRate);
+    
+    // Setup filter.
+    m_FilterLeft.setCoefficients (juce::IIRCoefficients::makeLowPass (sampleRate, Variables::filterCutoff));
+    m_FilterRight.setCoefficients (juce::IIRCoefficients::makeLowPass (sampleRate, Variables::filterCutoff));
     
     // Setup reverb.
     juce::Reverb::Parameters reverbParameters;
@@ -177,10 +180,6 @@ void Synthesis::prepareToPlay (float sampleRate, int blockSize)
     reverbParameters.wetLevel = 0.5f;
     reverbParameters.roomSize = 1.0f;
     m_Reverb.reset();
-
-    // Setup filter.
-    m_FilterLeft.setCoefficients (juce::IIRCoefficients::makeLowPass (sampleRate, Variables::filterCutoff));
-    m_FilterRight.setCoefficients (juce::IIRCoefficients::makeLowPass (sampleRate, Variables::filterCutoff));
 }
 
 
@@ -219,7 +218,7 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
             
             // Frequency modulation.
             auto currentFrequency = m_Oscillators[oscillatorIndex]->getFrequency();
-            auto modulatedFrequency = currentFrequency + ((currentFrequency / ((oscillatorIndex + 1) * 10)) * modulator);
+            auto modulatedFrequency = currentFrequency + ((currentFrequency / ((oscillatorIndex + 1) * 5)) * modulator);
             
             m_Oscillators[oscillatorIndex]->setFrequency (modulatedFrequency);
             m_Oscillators[oscillatorIndex]->updatePhaseDelta();
@@ -264,8 +263,20 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
     auto* rightChannel = buffer.getWritePointer (1);
     
     // Apply filter.
+    auto filterModulator = m_FilterModulator.processSample();
+    m_FilterLeft.setCoefficients (juce::IIRCoefficients::makeLowPass (m_SampleRate, Variables::filterCutoff * (filterModulator + 1.001f) * 100.0f));
+    m_FilterRight.setCoefficients (juce::IIRCoefficients::makeLowPass (m_SampleRate, Variables::filterCutoff * (filterModulator + 1.001f) * 100.0f));
+    
     m_FilterLeft.processSamples (leftChannel, buffer.getNumSamples());
     m_FilterRight.processSamples (rightChannel, buffer.getNumSamples());
+    
+    
+    // Apply distortion.
+    for (int i = 0; i < buffer.getNumSamples(); ++i)
+    {
+        leftChannel[i] = std::tanhf (leftChannel[i] * 5.0f);
+        rightChannel[i] = std::tanhf (rightChannel[i] * 5.0f);
+    }
     
     // Apply reverb.
     m_Reverb.processStereo (leftChannel, rightChannel, buffer.getNumSamples());
