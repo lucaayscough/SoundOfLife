@@ -1,6 +1,9 @@
 #pragma once
 
 
+//================================================//
+/// Cell class containing internal cell state.
+
 class Cell
 {
 public:
@@ -20,5 +23,5 @@ public:
     
 private:
     bool m_IsAlive = false;                     // Defines whether the cell is dead or alive.
-    float m_Fade = 0.0f;
+    float m_Fade = 0.0f;                        // Used to fade between dead/live states.
 };

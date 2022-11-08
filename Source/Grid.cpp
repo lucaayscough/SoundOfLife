@@ -6,18 +6,18 @@
 
 Grid::Grid()
 {
+    // Starts the timer used to refresh update grid state.
     startTimer (Variables::gridRefreshRate);
     
+    // Init cells.
     m_Cells.ensureStorageAllocated(Variables::numRows * Variables::numColumns);
     
-    for (int i = 0; i < Variables::numRows * Variables::numColumns; i++)
-    {
+    for (int i = 0; i < Variables::numRows * Variables::numColumns; ++i)
         m_Cells.add(new Cell());
-    }
     
-    for (int row = 0; row < Variables::numRows; row++)
+    for (int row = 0; row < Variables::numRows; ++row)
     {
-        for (int column = 0; column < Variables::numColumns; column++)
+        for (int column = 0; column < Variables::numColumns; ++column)
         {
             // Generates a random number between [n,1].
             int random = m_Random.nextInt (juce::Range<int> (Variables::lowRandomRange, 2));
@@ -38,6 +38,13 @@ Grid::~Grid() {}
 //================================================//
 // Setter methods.
 
+/**
+    Sets the state of a cell to alive or dead.
+    @param row Row index of the cell.
+    @param column Column index of the cell.
+    @param isAlive State of the cell.
+ */
+
 void Grid::setCellIsAlive (int row, int column, bool isAlive)
 {
     getCell (row, column)->setIsAlive(isAlive);
@@ -47,13 +54,26 @@ void Grid::setCellIsAlive (int row, int column, bool isAlive)
 //================================================//
 // Getter methods.
 
+/**
+    Returns pointer to a cell object.
+    @param row Row index of the cell.
+    @param column Column index of the cell.
+ */
+
 Cell* Grid::getCell (int row, int column)
 {
     return m_Cells[row * Variables::numColumns + column];
 }
 
+/**
+    Returns boolean representing the state of the cell.
+    @param row Row index of the cell.
+    @param column Column index of the cell.
+ */
+
 bool Grid::getCellIsAlive (int row, int column)
 {
+    // Used to make sure row and column values actually point to existing cell.
     if (row < 0 || column < 0 || row == Variables::numRows || column == Variables::numColumns)
         return 0;
     
@@ -64,6 +84,12 @@ bool Grid::getCellIsAlive (int row, int column)
 
 //================================================//
 // Grid logic methods.
+
+/**
+    Returns int representing number of live cells surrounding a given cell.
+    @param row Row index of the cell.
+    @param column Column index of the cell.
+ */
 
 int Grid::getNumAlive(int row, int column)
 {
@@ -82,6 +108,13 @@ int Grid::getNumAlive(int row, int column)
 
 //================================================//
 // Grid state methods.
+
+/**
+    Updates the state of a given cell based on the Conway Game of Life algorithm.
+    @param row Row index of the cell.
+    @param column Column index of the cell.
+    @param numAlive Number of live cells.
+ */
 
 void Grid::updateCellState(int row, int column, int numAlive)
 {
@@ -108,58 +141,25 @@ void Grid::updateCellState(int row, int column, int numAlive)
     getCell (row, column)->updateFade();
 }
 
+/**
+    Updates the state of the entire grid.
+ */
+
 void Grid::updateGridState()
 {
-    for (int row = 0; row < Variables::numRows; row++)
-    {
-        for (int column = 0; column < Variables::numColumns; column++)
-        {
-            // Get number of cells alive around current cell.
-            int numAlive = getNumAlive (row, column);
-            
-            // Calculate state for next iteration.
-            updateCellState (row, column, numAlive);
-        }
-    }
-}
-
-
-//
-
-float Grid::getDensity()
-{
-    float density;
-    
-    float centerX = (float)Variables::numColumns / 2.0f;
-    float centerY = (float)Variables::numRows / 2.0f;
-    
-    float r = std::sqrt (std::powf (centerX, 2.0f) + std::powf (centerY, 2.0f));
-    
-    float fade = 0;
-    float distance = 0;
-    float sum = 0;
-    
-    for (int column = 0; column < Variables::numColumns; ++column)
-    {
-        for (int row = 0; row < Variables::numRows; ++row)
-        {
-            fade = getCell (row, column)->getFade();
-            distance = std::sqrt (std::powf (centerX - column, 2.0f) + std::powf (centerY - row, 2.0f));
-            
-            sum += (3.0f / M_PI * fade * std::powf (1.0f - std::powf (distance / r, 2.0f), 2.0f));
-        }
-    }
-    
-    // Equation found here:
-    // https://doc.arcgis.com/en/insights/latest/analyze/GUID-81BF4C72-7A78-4987-9AB6-E941977D7635-web.png
-    density = 1.0f / std::powf (r, 2.0f) * sum;
-
-    return density;
+    for (int row = 0; row < Variables::numRows; ++row)
+        for (int column = 0; column < Variables::numColumns; ++column)
+            updateCellState (row, column, getNumAlive (row, column));
 }
 
 
 //================================================//
 // Timer class methods.
+
+/**
+    Inherited from juce::Timer class.
+    This is used to regularly update the grid based on a set time interval.
+ */
 
 void Grid::timerCallback()
 {

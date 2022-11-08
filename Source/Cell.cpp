@@ -26,6 +26,10 @@ float Cell::getFade()                                               { return m_F
 //================================================//
 // State methods.
 
+/**
+    Updates cell fade value.
+ */
+
 void Cell::updateFade()
 {
     if (m_IsAlive && m_Fade < 1.0f)

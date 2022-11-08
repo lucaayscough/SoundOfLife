@@ -4,10 +4,10 @@
 //================================================//
 // Synthesis class.
 
-Synthesis::Synthesis(Grid& grid)
+Synthesis::Synthesis (Grid& grid)
     :   m_Grid (grid)
 {
-    // Init Oscillators.
+    // Init oscillators.
     m_Oscillators.ensureStorageAllocated (Variables::numOscillators);
     m_Oscillators.ensureStorageAllocated (Variables::numLFOs);
     
@@ -219,11 +219,6 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
     
     auto* leftChannel = buffer.getWritePointer (0);
     auto* rightChannel = buffer.getWritePointer (1);
-    
-    auto density = m_Grid.getDensity();
-    
-    //m_FilterLeft.setCoefficients (juce::IIRCoefficients::makeLowPass (m_SampleRate, Variables::filterCutoff + (density * 1000)));
-    //m_FilterRight.setCoefficients (juce::IIRCoefficients::makeLowPass (m_SampleRate, Variables::filterCutoff + (density * 1000)));
     
     m_FilterLeft.processSamples (leftChannel, buffer.getNumSamples());
     m_FilterRight.processSamples (rightChannel, buffer.getNumSamples());

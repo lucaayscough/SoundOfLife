@@ -10,11 +10,11 @@ struct Variables
     static const int numRows = 16;
     static const int numColumns = 16;
     
-    static const int gridRefreshRate = 10000;
+    static const int gridRefreshRate = 5000;
     static const int uiRefreshRate = 33;
     
     static const int lowRandomRange = 0;
-    static constexpr float fadeAmount = 0.00001f;
+    static constexpr float fadeAmount = 0.0000005f;
     
     static const int numOscillators = 16;
     static const int numLFOs = 4;
