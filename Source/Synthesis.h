@@ -15,12 +15,12 @@ public:
     
     // Getter methods.
     int getBlockSize();
-    float getColumnGain (int column);
-    float getColumnPan (int column);
-    float getSpectralGainDecay (float gain, float column, float frequency);
+    float getOscillatorGain (int oscillatorIndex);
+    float getOscillatorPan (int oscillatorIndex);
+    float getSpectralGainDecay (float gain, float frequency);
     
     // State methods.
-    void updateFadeValues (int column);
+    void updateFadeValues (int oscillatorIndex);
     
     // Init methods.
     void prepareToPlay (float frequency, float sampleRate, int blockSize);

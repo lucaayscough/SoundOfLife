@@ -8,10 +8,10 @@ Synthesis::Synthesis(Grid& grid)
     :   m_Grid (grid)
 {
     // Init Oscillators.
-    m_Oscillators.ensureStorageAllocated (Variables::numColumns);
+    m_Oscillators.ensureStorageAllocated (Variables::numOscillators);
     m_Oscillators.ensureStorageAllocated (Variables::numLFOs);
     
-    for (int i = 0; i < Variables::numColumns; ++i)
+    for (int i = 0; i < Variables::numOscillators; ++i)
         m_Oscillators.add (new SineOscillator());
     
     for (int i = 0; i < Variables::numLFOs; ++i)
@@ -32,37 +32,49 @@ void Synthesis::setBlockSize (int blockSize)                        { m_BlockSiz
 
 int Synthesis::getBlockSize()                                       { return m_BlockSize; }
 
-float Synthesis::getColumnGain (int column)
+float Synthesis::getOscillatorGain (int oscillatorIndex)
 {
     float gain = 0;
     
-    for (int row = 0; row < Variables::numRows; ++row)
-        gain += m_Grid.getCell (row, column)->getFade();
+    float startColumn = oscillatorIndex * (Variables::numColumns / Variables::numOscillators);
+    float endColumn = startColumn + (Variables::numColumns / Variables::numOscillators);
     
-    gain /= (float)Variables::numRows;
+    for (int column = startColumn; column < endColumn; ++column)
+    {
+        for (int row = 0; row < Variables::numRows; ++row)
+            gain += m_Grid.getCell (row, column)->getFade();
+    }
+    
+    gain /= (float)Variables::numRows * (float)Variables::numColumns / (float)Variables::numOscillators;
     
     return gain;
 }
 
-float Synthesis::getColumnPan (int column)
+float Synthesis::getOscillatorPan (int oscillatorIndex)
 {
     // TODO:
     // Make this more precise.
     
     float pan = 0;
     
-    for (int row = 0; row < Variables::numRows; ++row)
+    float startColumn = oscillatorIndex * (Variables::numColumns / Variables::numOscillators);
+    float endColumn = startColumn + (Variables::numColumns / Variables::numOscillators);
+    
+    for (int column = startColumn; column < endColumn; ++column)
     {
-        Cell& cell = *m_Grid.getCell (row, column);
-        
-        if (row < Variables::numRows / 2)
-            pan += cell.getFade();
-        
-        else
-            pan -= cell.getFade();
+        for (int row = 0; row < Variables::numRows; ++row)
+        {
+            Cell& cell = *m_Grid.getCell (row, column);
+            
+            if (row < Variables::numRows / 2)
+                pan += cell.getFade();
+            
+            else
+                pan -= cell.getFade();
+        }
     }
     
-    pan /= Variables::numRows / 2.0;
+    pan /= Variables::numRows * (endColumn - startColumn) / 2.0;
     
     if (pan > 1.0)
         pan = 1.0;
@@ -72,7 +84,7 @@ float Synthesis::getColumnPan (int column)
     return pan;
 }
 
-float Synthesis::getSpectralGainDecay (float gain, float column, float frequency)
+float Synthesis::getSpectralGainDecay (float gain, float frequency)
 {
     // Explanation for this is here: https://en.wikipedia.org/wiki/Pink_noise
     return gain * Variables::startFrequency * (1.0 / frequency) ;
@@ -82,10 +94,14 @@ float Synthesis::getSpectralGainDecay (float gain, float column, float frequency
 //================================================//
 // State methods.
 
-void Synthesis::updateFadeValues (int column)
+void Synthesis::updateFadeValues (int oscillatorIndex)
 {
-    for (int row = 0; row < Variables::numRows; ++row)
-        m_Grid.getCell (row, column)->updateFade();
+    float startColumn = oscillatorIndex * (Variables::numColumns / Variables::numOscillators);
+    float endColumn = startColumn + (Variables::numColumns / Variables::numOscillators);
+    
+    for (int column = startColumn; column < endColumn; ++column)
+        for (int row = 0; row < Variables::numRows; ++row)
+            m_Grid.getCell (row, column)->updateFade();
 }
 
 
@@ -96,7 +112,7 @@ void Synthesis::prepareToPlay (float frequency, float sampleRate, int blockSize)
 {
     DBG ("Setting up oscillators...");
     
-    for (int i = 0; i < Variables::numColumns; ++i)
+    for (int i = 0; i < Variables::numOscillators; ++i)
     {
         DBG (frequency);
         m_Oscillators[i]->prepareToPlay (frequency, sampleRate, blockSize);
@@ -144,7 +160,7 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
     buffer.clear();
     block.clear();
     
-    for (int column = 0; column < Variables::numColumns; ++column)
+    for (int oscillatorIndex = 0; oscillatorIndex < Variables::numOscillators; ++oscillatorIndex)
     {
         panValues.clearQuick();
         
@@ -159,17 +175,17 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
             
             */
             // Sample to be further processed.
-            sample = m_Oscillators[column]->processSample();
+            sample = m_Oscillators[oscillatorIndex]->processSample();
             
             // Gain to be applied.
-            gain = getColumnGain (column);
-            gain *= getSpectralGainDecay (gain, column, m_Oscillators[column]->getFrequency());
+            gain = getOscillatorGain (oscillatorIndex);
+            gain *= getSpectralGainDecay (gain, m_Oscillators[oscillatorIndex]->getFrequency());
             
             // Pan to be applied.
-            panValues.add (getColumnPan (column));
+            panValues.add (getOscillatorPan (oscillatorIndex));
             
             // Update fade values for entire column.
-            updateFadeValues (column);
+            updateFadeValues (oscillatorIndex);
         
             // Apply processing to sample.
             sample *= gain;
@@ -196,8 +212,8 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
         buffer.addFrom (channel, 0, block, channel, 0, blockSize);
     }
     
-    auto* leftChannel = buffer.getWritePointer(0);
-    auto* rightChannel = buffer.getWritePointer(1);
+    //auto* leftChannel = buffer.getWritePointer(0);
+    //auto* rightChannel = buffer.getWritePointer(1);
     
     //m_Filter.processSamples(leftChannel, buffer.getNumSamples());
     //m_Filter.processSamples(rightChannel, buffer.getNumSamples());
