@@ -133,7 +133,7 @@ void SoundOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         float size = channelData[sample];
         
         if (size > 1.0f || size < -1.0f)
-            DBG ("Very loud");
+             DBG ("Very loud");
     }
 }
 

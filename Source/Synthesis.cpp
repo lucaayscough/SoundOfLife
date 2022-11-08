@@ -128,14 +128,14 @@ void Synthesis::prepareToPlay (float sampleRate, int blockSize)
     
     // Reverb.
     juce::Reverb::Parameters reverbParameters;
-    reverbParameters.dryLevel = 0.0f;
-    reverbParameters.wetLevel = 1.0f;
+    reverbParameters.dryLevel = 0.5f;
+    reverbParameters.wetLevel = 0.5f;
     reverbParameters.roomSize = 1.0f;
     m_Reverb.reset();
 
     // Filter.
-    m_FilterLeft.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 300.0));
-    m_FilterRight.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 300.0));
+    m_FilterLeft.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, Variables::filterCutoff));
+    m_FilterRight.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, Variables::filterCutoff));
 }
 
 
@@ -165,14 +165,16 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
         
         for (int i = 0; i < blockSize; ++i)
         {
-            /*
             // Frequency modulation.
-            auto oldFreq = m_Oscillators[column]->getFrequency();
-            auto newFreq = oldFreq + (m_LFOs[column % Variables::numLFOs]->processSample() * 40.0);
-    
-            m_Oscillators[column]->setFrequency (newFreq);
+            auto currentFrequency = m_Oscillators[oscillatorIndex]->getFrequency();
+            auto modulatedFrequency = currentFrequency + ((currentFrequency / ((oscillatorIndex + 1) * 10)) * m_LFOs[oscillatorIndex % Variables::numLFOs]->processSample());
             
-            */
+            m_Oscillators[oscillatorIndex]->setFrequency (modulatedFrequency);
+            m_Oscillators[oscillatorIndex]->updatePhaseDelta();
+            
+            
+            
+            
             // Sample to be further processed.
             sample = m_Oscillators[oscillatorIndex]->processSample();
             
@@ -196,10 +198,8 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
                 channelData[i] += sample;
             }
             
-            /*
             // Reset values.
-            m_Oscillators[column]->setFrequency (oldFreq);
-             */
+            m_Oscillators[oscillatorIndex]->setFrequency (currentFrequency);
         }
         
         // Apply pan to buffer.
@@ -211,11 +211,12 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
         buffer.addFrom (channel, 0, block, channel, 0, blockSize);
     }
     
-    auto* leftChannel = buffer.getWritePointer(0);
-    auto* rightChannel = buffer.getWritePointer(1);
+    auto* leftChannel = buffer.getWritePointer (0);
+    auto* rightChannel = buffer.getWritePointer (1);
     
-    m_FilterLeft.processSamples(leftChannel, buffer.getNumSamples());
-    m_FilterRight.processSamples(rightChannel, buffer.getNumSamples());
+    //m_FilterLeft.processSamples (leftChannel, buffer.getNumSamples());
+    //m_FilterRight.processSamples (rightChannel, buffer.getNumSamples());
     
-    m_Reverb.processStereo(leftChannel, rightChannel, buffer.getNumSamples());
+    m_Reverb.processStereo (leftChannel, rightChannel, buffer.getNumSamples());
+    m_Reverb.reset();
 }
