@@ -27,6 +27,9 @@ public:
     void updateCellState (int row, int column, int numAlive);
     void updateGridState();
     
+    // Statics.
+    float getDensity();
+    
     // Timer class methods.
     void timerCallback() override;
     

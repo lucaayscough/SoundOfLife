@@ -35,23 +35,15 @@ void Grid::initializeGrid()
     {
         for (int column = 0; column < Variables::numColumns; column++)
         {
-            // If cell is a border cell set to dead.
-            if (row == 0 || row == Variables::numRows - 1 || column == 0 || column == Variables::numColumns - 1)
-                setCellIsAlive (row, column, false);
+            // Generates a random number between [n,1].
+            int random = m_Random.nextInt (juce::Range<int> (Variables::lowRandomRange, 2));
             
-            // Else randomly set to 0 or 1.
-            else
-            {
-                // Generates a random number between [n, 1].
-                int random = m_Random.nextInt (juce::Range<int> (Variables::lowRandomRange, 2));
-                
-                // This constrains the random number to [0,1].
-                // It is used to increase the chances random is 0.
-                if (random < 0)
-                    random = 0;
-            
-                setCellIsAlive (row, column, random);
-            }
+            // This constrains the random number to [0,1].
+            // It is used to increase the chances random is 0.
+            if (random < 0)
+                random = 0;
+        
+            setCellIsAlive (row, column, random);
         }
     }
 }
@@ -75,7 +67,11 @@ Cell* Grid::getCell (int row, int column)
 
 bool Grid::getCellIsAlive (int row, int column)
 {
-    return getCell (row, column)->getIsAlive();
+    if (row < 0 || column < 0 || row == Variables::numRows || column == Variables::numColumns)
+        return 0;
+    
+    else
+        return getCell (row, column)->getIsAlive();
 }
 
 
@@ -127,9 +123,9 @@ void Grid::updateCellState(int row, int column, int numAlive)
 
 void Grid::updateGridState()
 {
-    for (int row = 1; row < Variables::numRows - 1; row++)
+    for (int row = 0; row < Variables::numRows; row++)
     {
-        for (int column = 1; column < Variables::numColumns - 1; column++)
+        for (int column = 0; column < Variables::numColumns; column++)
         {
             // Get number of cells alive around current cell.
             int numAlive = getNumAlive (row, column);
@@ -138,6 +134,40 @@ void Grid::updateGridState()
             updateCellState (row, column, numAlive);
         }
     }
+}
+
+
+//
+
+float Grid::getDensity()
+{
+    float density;
+    
+    float centerX = (float)Variables::numColumns / 2.0f;
+    float centerY = (float)Variables::numRows / 2.0f;
+    
+    float r = std::sqrt (std::powf (centerX, 2.0f) + std::powf (centerY, 2.0f));
+    
+    float fade = 0;
+    float distance = 0;
+    float sum = 0;
+    
+    for (int column = 0; column < Variables::numColumns; ++column)
+    {
+        for (int row = 0; row < Variables::numRows; ++row)
+        {
+            fade = getCell (row, column)->getFade();
+            distance = std::sqrt (std::powf (centerX - column, 2.0f) + std::powf (centerY - row, 2.0f));
+            
+            sum += (3.0f / M_PI * fade * std::powf (1.0f - std::powf (distance / r, 2.0f), 2.0f));
+        }
+    }
+    
+    // Equation found here:
+    // https://doc.arcgis.com/en/insights/latest/analyze/GUID-81BF4C72-7A78-4987-9AB6-E941977D7635-web.png
+    density = 1.0f / std::powf (r, 2.0f) * sum;
+
+    return density;
 }
 
 

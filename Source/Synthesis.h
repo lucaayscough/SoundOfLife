@@ -30,8 +30,11 @@ public:
     
 private:
     juce::OwnedArray<SineOscillator> m_Oscillators;
+    juce::OwnedArray<SineOscillator> m_LFOs;
     
     Panner m_Panner;
+    juce::Reverb m_Reverb;
+    juce::IIRFilter m_Filter;
     
     Grid& m_Grid;
     

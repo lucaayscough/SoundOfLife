@@ -75,9 +75,7 @@ const juce::String SoundOfLifeAudioProcessor::getProgramName (int index)
     return {};
 }
 
-void SoundOfLifeAudioProcessor::changeProgramName (int index, const juce::String& newName)
-{
-}
+void SoundOfLifeAudioProcessor::changeProgramName (int index, const juce::String& newName) {}
 
 //==============================================================================
 void SoundOfLifeAudioProcessor::prepareToPlay(double sampleRate, int blockSize)
@@ -119,8 +117,7 @@ void SoundOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     
     m_Synthesis.processBlock (buffer);
     
-    
-    
+    // Precaution for my ears...
     auto* channelData = buffer.getWritePointer(0);
     
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
