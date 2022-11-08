@@ -8,29 +8,13 @@ Grid::Grid()
 {
     startTimer (Variables::gridRefreshRate);
     
-    initializeCells();
-    initializeGrid();
-}
-
-Grid::~Grid() {}
-
-
-//================================================//
-// Init methods.
-
-
-void Grid:: initializeCells()
-{
     m_Cells.ensureStorageAllocated(Variables::numRows * Variables::numColumns);
     
     for (int i = 0; i < Variables::numRows * Variables::numColumns; i++)
     {
         m_Cells.add(new Cell());
     }
-}
-
-void Grid::initializeGrid()
-{
+    
     for (int row = 0; row < Variables::numRows; row++)
     {
         for (int column = 0; column < Variables::numColumns; column++)
@@ -47,6 +31,9 @@ void Grid::initializeGrid()
         }
     }
 }
+
+Grid::~Grid() {}
+
 
 //================================================//
 // Setter methods.

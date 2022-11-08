@@ -87,7 +87,7 @@ float Synthesis::getOscillatorPan (int oscillatorIndex)
 float Synthesis::getSpectralGainDecay (float gain, float frequency)
 {
     // Explanation for this is here: https://en.wikipedia.org/wiki/Pink_noise
-    return gain * Variables::startFrequency * (1.0 / frequency) ;
+    return gain * Variables::startFrequency * (1.0f / frequency) ;
 }
 
 

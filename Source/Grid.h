@@ -9,10 +9,6 @@ public:
     Grid();
     ~Grid();
     
-    // Init methods.
-    void initializeCells();
-    void initializeGrid();
-    
     // Setter methods.
     void setCellIsAlive (int row, int column, bool isAlive);
     
