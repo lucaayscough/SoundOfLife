@@ -25,12 +25,18 @@ Synthesis::~Synthesis() {}
 // Setter methods.
 
 void Synthesis::setBlockSize (int blockSize)                        { m_BlockSize = blockSize; }
+void Synthesis::setSampleRate (float sampleRate)                    { m_SampleRate = sampleRate; }
 
 
 //================================================//
 // Getter methods.
 
 int Synthesis::getBlockSize()                                       { return m_BlockSize; }
+float Synthesis::getSampleRate()                                    { return m_SampleRate; }
+
+
+//================================================//
+// Helper methods.
 
 float Synthesis::getOscillatorGain (int oscillatorIndex)
 {
@@ -125,6 +131,7 @@ void Synthesis::prepareToPlay (float sampleRate, int blockSize)
         m_LFOs[i]->prepareToPlay (Variables::frequencyLFO[i], sampleRate, blockSize);
     
     setBlockSize (blockSize);
+    setSampleRate (sampleRate);
     
     // Reverb.
     juce::Reverb::Parameters reverbParameters;
@@ -134,8 +141,8 @@ void Synthesis::prepareToPlay (float sampleRate, int blockSize)
     m_Reverb.reset();
 
     // Filter.
-    m_FilterLeft.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, Variables::filterCutoff));
-    m_FilterRight.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, Variables::filterCutoff));
+    m_FilterLeft.setCoefficients (juce::IIRCoefficients::makeLowPass (sampleRate, Variables::filterCutoff));
+    m_FilterRight.setCoefficients (juce::IIRCoefficients::makeLowPass (sampleRate, Variables::filterCutoff));
 }
 
 
@@ -165,15 +172,14 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
         
         for (int i = 0; i < blockSize; ++i)
         {
+            auto modulator = m_LFOs[oscillatorIndex % Variables::numLFOs]->processSample();
+            
             // Frequency modulation.
             auto currentFrequency = m_Oscillators[oscillatorIndex]->getFrequency();
-            auto modulatedFrequency = currentFrequency + ((currentFrequency / ((oscillatorIndex + 1) * 10)) * m_LFOs[oscillatorIndex % Variables::numLFOs]->processSample());
+            auto modulatedFrequency = currentFrequency + ((currentFrequency / ((oscillatorIndex + 1) * 10)) * modulator);
             
             m_Oscillators[oscillatorIndex]->setFrequency (modulatedFrequency);
             m_Oscillators[oscillatorIndex]->updatePhaseDelta();
-            
-            
-            
             
             // Sample to be further processed.
             sample = m_Oscillators[oscillatorIndex]->processSample();
@@ -214,8 +220,13 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
     auto* leftChannel = buffer.getWritePointer (0);
     auto* rightChannel = buffer.getWritePointer (1);
     
-    //m_FilterLeft.processSamples (leftChannel, buffer.getNumSamples());
-    //m_FilterRight.processSamples (rightChannel, buffer.getNumSamples());
+    auto density = m_Grid.getDensity();
+    
+    //m_FilterLeft.setCoefficients (juce::IIRCoefficients::makeLowPass (m_SampleRate, Variables::filterCutoff + (density * 1000)));
+    //m_FilterRight.setCoefficients (juce::IIRCoefficients::makeLowPass (m_SampleRate, Variables::filterCutoff + (density * 1000)));
+    
+    m_FilterLeft.processSamples (leftChannel, buffer.getNumSamples());
+    m_FilterRight.processSamples (rightChannel, buffer.getNumSamples());
     
     m_Reverb.processStereo (leftChannel, rightChannel, buffer.getNumSamples());
     m_Reverb.reset();

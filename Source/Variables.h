@@ -5,7 +5,7 @@ struct Variables
 {
     static const int windowHeight = 1024.0;
     static const int windowWidth = 1024.0;
-    static const bool useColour = false;
+    static const bool useColour = true;
     
     static const int numRows = 16;
     static const int numColumns = 16;
@@ -14,7 +14,7 @@ struct Variables
     static const int uiRefreshRate = 33;
     
     static const int lowRandomRange = 0;
-    static constexpr float fadeAmount = 0.000001f;
+    static constexpr float fadeAmount = 0.00001f;
     
     static const int numOscillators = 16;
     static const int numLFOs = 4;

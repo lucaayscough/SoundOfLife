@@ -12,9 +12,13 @@ public:
     
     // Setter methods.
     void setBlockSize (int blockSize);
+    void setSampleRate (float sampleRate);
     
     // Getter methods.
     int getBlockSize();
+    float getSampleRate();
+    
+    // Helper methods.
     float getOscillatorGain (int oscillatorIndex);
     float getOscillatorPan (int oscillatorIndex);
     float getSpectralGainDecay (float gain, float frequency);
@@ -41,6 +45,7 @@ private:
     Grid& m_Grid;
     
     int m_BlockSize;
+    float m_SampleRate;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Synthesis)
 };
