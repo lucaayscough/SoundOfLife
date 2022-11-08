@@ -33,12 +33,8 @@ float Cell::getFade()                                               { return m_F
 void Cell::updateFade()
 {
     if (m_IsAlive && m_Fade < 1.0f)
-    {
         m_Fade += Variables::fadeAmount;
-    }
     
     else if (!m_IsAlive && m_Fade > 0.0f)
-    {
         m_Fade -= Variables::fadeAmount;
-    }
 }

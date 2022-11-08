@@ -50,8 +50,8 @@ public:
     Grid& getGrid();
 
 private:
-    Grid m_Grid;
-    Synthesis m_Synthesis;
+    Grid m_Grid;                            // Grid object containing all state and logic the Game of Life simulation.
+    Synthesis m_Synthesis;                  // Synthesis object containing all audio sources and processing.
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoundOfLifeAudioProcessor)
 };

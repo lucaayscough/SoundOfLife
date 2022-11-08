@@ -4,6 +4,11 @@
 //================================================//
 // Synthesis class.
 
+/**
+    Constructor of the synthesis class.
+    @param Grid Reference to a grid object.
+ */
+
 Synthesis::Synthesis (Grid& grid)
     :   m_Grid (grid)
 {
@@ -38,6 +43,12 @@ float Synthesis::getSampleRate()                                    { return m_S
 //================================================//
 // Helper methods.
 
+/**
+    Returns a float representing a gain value for a given oscillator.
+    @param oscillatorIndex Index of an oscillator.
+ */
+
+
 float Synthesis::getOscillatorGain (int oscillatorIndex)
 {
     float gain = 0;
@@ -45,16 +56,23 @@ float Synthesis::getOscillatorGain (int oscillatorIndex)
     float startColumn = oscillatorIndex * (Variables::numColumns / Variables::numOscillators);
     float endColumn = startColumn + (Variables::numColumns / Variables::numOscillators);
     
+    //Sum all fade values in a block of cells.
     for (int column = startColumn; column < endColumn; ++column)
     {
         for (int row = 0; row < Variables::numRows; ++row)
             gain += m_Grid.getCell (row, column)->getFade();
     }
     
+    // Normalize value to range [0,1].
     gain /= (float)Variables::numRows * (float)Variables::numColumns / (float)Variables::numOscillators;
     
     return gain;
 }
+
+/**
+    Returns a float representing the pan value for a given oscillator.
+    @param oscillatorIndex Index of an oscillator.
+ */
 
 float Synthesis::getOscillatorPan (int oscillatorIndex)
 {
@@ -90,6 +108,12 @@ float Synthesis::getOscillatorPan (int oscillatorIndex)
     return pan;
 }
 
+/**
+    Returns a float representing a gain value normalised based on frequency.
+    @param gain Gain to be normalised.
+    @param frequency Frequency used for normalisation.
+ */
+
 float Synthesis::getSpectralGainDecay (float gain, float frequency)
 {
     // Explanation for this is here: https://en.wikipedia.org/wiki/Pink_noise
@@ -99,6 +123,11 @@ float Synthesis::getSpectralGainDecay (float gain, float frequency)
 
 //================================================//
 // State methods.
+
+/**
+    Updates fade values of a block of cells given an oscillator.
+    @param oscillatorIndex Index of an oscillator.
+ */
 
 void Synthesis::updateFadeValues (int oscillatorIndex)
 {
@@ -114,8 +143,15 @@ void Synthesis::updateFadeValues (int oscillatorIndex)
 //================================================//
 // Init methods.
 
+/**
+    Prepares all components to be processe.
+    @param sampleRate Sample rate to be used.
+    @param blockSize Block size to be used.
+ */
+
 void Synthesis::prepareToPlay (float sampleRate, int blockSize)
 {
+    // Setup oscillators.
     auto frequency = Variables::startFrequency;
     
     for (int i = 0; i < Variables::numOscillators; ++i)
@@ -127,20 +163,22 @@ void Synthesis::prepareToPlay (float sampleRate, int blockSize)
         frequency += frequency / (i + 1.0f) * Variables::inharmonicity;
     }
     
+    // Setup LFOs.
     for (int i = 0; i < Variables::numLFOs; ++i)
         m_LFOs[i]->prepareToPlay (Variables::frequencyLFO[i], sampleRate, blockSize);
     
+    // Set member variables.
     setBlockSize (blockSize);
     setSampleRate (sampleRate);
     
-    // Reverb.
+    // Setup reverb.
     juce::Reverb::Parameters reverbParameters;
     reverbParameters.dryLevel = 0.5f;
     reverbParameters.wetLevel = 0.5f;
     reverbParameters.roomSize = 1.0f;
     m_Reverb.reset();
 
-    // Filter.
+    // Setup filter.
     m_FilterLeft.setCoefficients (juce::IIRCoefficients::makeLowPass (sampleRate, Variables::filterCutoff));
     m_FilterRight.setCoefficients (juce::IIRCoefficients::makeLowPass (sampleRate, Variables::filterCutoff));
 }
@@ -148,6 +186,11 @@ void Synthesis::prepareToPlay (float sampleRate, int blockSize)
 
 //================================================//
 // DSP methods.
+
+/**
+    Processes all audio content and inserts into an audio buffer.
+    @param buffer Reference to an audio buffer.
+ */
 
 void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
 {
@@ -212,17 +255,19 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
         m_Panner.processBlock (block, panValues);
     }
     
+    // Add to final audio buffer.
     for (int channel = 0; channel < numChannels; ++channel)
-    {
         buffer.addFrom (channel, 0, block, channel, 0, blockSize);
-    }
+    
     
     auto* leftChannel = buffer.getWritePointer (0);
     auto* rightChannel = buffer.getWritePointer (1);
     
+    // Apply filter.
     m_FilterLeft.processSamples (leftChannel, buffer.getNumSamples());
     m_FilterRight.processSamples (rightChannel, buffer.getNumSamples());
     
+    // Apply reverb.
     m_Reverb.processStereo (leftChannel, rightChannel, buffer.getNumSamples());
     m_Reverb.reset();
 }

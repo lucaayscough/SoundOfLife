@@ -33,19 +33,19 @@ public:
     void processBlock (juce::AudioBuffer<float>& buffer);
     
 private:
-    juce::OwnedArray<SineOscillator> m_Oscillators;
-    juce::OwnedArray<SineOscillator> m_LFOs;
+    juce::OwnedArray<SineOscillator> m_Oscillators;             // Array of oscillators.
+    juce::OwnedArray<SineOscillator> m_LFOs;                    // Array of LFOs.
     
-    Panner m_Panner;
-    juce::Reverb m_Reverb;
+    Panner m_Panner;                                            // Panner used to pan oscillators.
+    juce::Reverb m_Reverb;                                      // Reverb used at end of signal chain.
     
-    juce::IIRFilter m_FilterLeft;
-    juce::IIRFilter m_FilterRight;
+    juce::IIRFilter m_FilterLeft;                               // Filter for left channel.
+    juce::IIRFilter m_FilterRight;                              // Filter for right channel.
     
-    Grid& m_Grid;
+    Grid& m_Grid;                                               // Reference to grid object.
     
-    int m_BlockSize;
-    float m_SampleRate;
+    int m_BlockSize;                                            // Requested block size.
+    float m_SampleRate;                                         // Requested sample rate.
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Synthesis)
 };

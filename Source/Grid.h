@@ -1,5 +1,6 @@
 #pragma once
 
+
 //================================================//
 /// Grid class containing all cells and logic for game of life algorithm.
 
