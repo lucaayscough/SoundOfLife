@@ -74,6 +74,7 @@ float Synthesis::getColumnPan (int column)
 
 float Synthesis::getSpectralGainDecay (float gain, float column, float frequency)
 {
+    // Explanation for this is here: https://en.wikipedia.org/wiki/Pink_noise
     return gain * Variables::startFrequency * (1.0 / frequency) ;
 }
 
@@ -93,8 +94,14 @@ void Synthesis::updateFadeValues (int column)
 
 void Synthesis::prepareToPlay (float frequency, float sampleRate, int blockSize)
 {
+    DBG ("Setting up oscillators...");
+    
     for (int i = 0; i < Variables::numColumns; ++i)
-        m_Oscillators[i]->prepareToPlay (frequency * (Variables::frequencyMultiplier * i + 1), sampleRate, blockSize);
+    {
+        DBG (frequency);
+        m_Oscillators[i]->prepareToPlay (frequency, sampleRate, blockSize);
+        frequency += frequency / (i + 1.0f);
+    }
     
     for (int i = 0; i < Variables::numLFOs; ++i)
         m_LFOs[i]->prepareToPlay (Variables::frequencyLFO[i], sampleRate, blockSize);
