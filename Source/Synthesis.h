@@ -23,7 +23,7 @@ public:
     void updateFadeValues (int oscillatorIndex);
     
     // Init methods.
-    void prepareToPlay (float frequency, float sampleRate, int blockSize);
+    void prepareToPlay (float sampleRate, int blockSize);
     
     // DSP methods.
     void processBlock (juce::AudioBuffer<float>& buffer);
@@ -34,7 +34,9 @@ private:
     
     Panner m_Panner;
     juce::Reverb m_Reverb;
-    juce::IIRFilter m_Filter;
+    
+    juce::IIRFilter m_FilterLeft;
+    juce::IIRFilter m_FilterRight;
     
     Grid& m_Grid;
     

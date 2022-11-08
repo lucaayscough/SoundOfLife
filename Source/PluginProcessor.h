@@ -52,6 +52,11 @@ public:
 private:
     Grid m_Grid;
     Synthesis m_Synthesis;
+    TriangleOscillator tri;
+    juce::IIRFilter filterLeft;
+    juce::IIRFilter filterRight;
+    
+    //juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> lowPassFilter;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoundOfLifeAudioProcessor)
 };

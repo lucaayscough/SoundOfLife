@@ -80,7 +80,12 @@ void SoundOfLifeAudioProcessor::changeProgramName (int index, const juce::String
 //==============================================================================
 void SoundOfLifeAudioProcessor::prepareToPlay(double sampleRate, int blockSize)
 {
-    m_Synthesis.prepareToPlay (Variables::startFrequency, sampleRate, blockSize);
+    m_Synthesis.prepareToPlay (sampleRate, blockSize);
+    tri.prepareToPlay(220, sampleRate, blockSize);
+    
+    filterLeft.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 200));
+    filterRight.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 200));
+    
 }
 
 void SoundOfLifeAudioProcessor::releaseResources() {}
@@ -116,6 +121,9 @@ void SoundOfLifeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     juce::ScopedNoDenormals noDenormals;
     
     m_Synthesis.processBlock (buffer);
+ 
+    
+    
     
     // Precaution for my ears...
     auto* channelData = buffer.getWritePointer(0);

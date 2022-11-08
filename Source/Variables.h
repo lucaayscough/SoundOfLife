@@ -5,7 +5,7 @@ struct Variables
 {
     static const int windowHeight = 1024.0;
     static const int windowWidth = 1024.0;
-    static const bool useColour = true;
+    static const bool useColour = false;
     
     static const int numRows = 16;
     static const int numColumns = 16;

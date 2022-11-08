@@ -108,13 +108,12 @@ void Synthesis::updateFadeValues (int oscillatorIndex)
 //================================================//
 // Init methods.
 
-void Synthesis::prepareToPlay (float frequency, float sampleRate, int blockSize)
+void Synthesis::prepareToPlay (float sampleRate, int blockSize)
 {
-    DBG ("Setting up oscillators...");
+    auto frequency = Variables::startFrequency;
     
     for (int i = 0; i < Variables::numOscillators; ++i)
     {
-        DBG (frequency);
         m_Oscillators[i]->prepareToPlay (frequency, sampleRate, blockSize);
         
         // Harmonic series: https://en.wikipedia.org/wiki/Harmonic_series_(mathematics)
@@ -135,8 +134,8 @@ void Synthesis::prepareToPlay (float frequency, float sampleRate, int blockSize)
     m_Reverb.reset();
 
     // Filter.
-    m_Filter.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 1000));
-    m_Filter.reset();
+    m_FilterLeft.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 300.0));
+    m_FilterRight.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 300.0));
 }
 
 
@@ -212,11 +211,11 @@ void Synthesis::processBlock (juce::AudioBuffer<float>& buffer)
         buffer.addFrom (channel, 0, block, channel, 0, blockSize);
     }
     
-    //auto* leftChannel = buffer.getWritePointer(0);
-    //auto* rightChannel = buffer.getWritePointer(1);
+    auto* leftChannel = buffer.getWritePointer(0);
+    auto* rightChannel = buffer.getWritePointer(1);
     
-    //m_Filter.processSamples(leftChannel, buffer.getNumSamples());
-    //m_Filter.processSamples(rightChannel, buffer.getNumSamples());
+    m_FilterLeft.processSamples(leftChannel, buffer.getNumSamples());
+    m_FilterRight.processSamples(rightChannel, buffer.getNumSamples());
     
-    //m_Reverb.processStereo(leftChannel, rightChannel, buffer.getNumSamples());
+    m_Reverb.processStereo(leftChannel, rightChannel, buffer.getNumSamples());
 }
